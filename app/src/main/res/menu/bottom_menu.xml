@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/bottomCropImage"
+        android:title="Image"
+        android:icon="@drawable/ic_baseline_image_24"
+        android:enabled="true"
+
+
+        />
+    <item
+        android:id="@+id/bottomCropSquare"
+        android:title="Square"
+        android:enabled="true"
+
+        android:icon="@drawable/ic_baseline_crop_square_24"/>
+    <item
+        android:id="@+id/bottomCropOval"
+        android:title="Oval"
+        android:enabled="true"
+        android:icon="@drawable/ic_baseline_oval_24"/>
+    <item
+    android:id="@+id/bottomCropFree"
+    android:title="Free"
+    android:enabled="true"
+    android:icon="@drawable/ic_baseline_trending_up_24"/>
+    <item
+        android:id="@+id/bottomCropSelectAll"
+        android:title="Select all"
+        android:enabled="true"
+        android:icon="@drawable/ic_baseline_border_outer"/>
+
+</menu>
