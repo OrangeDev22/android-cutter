@@ -9,11 +9,11 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import com.example.cutter.views.CustomView;
+import com.example.cutter.views.DrawView;
 
 
 public class FirstFragment extends Fragment {
-    private CustomView customView;
+    private DrawView drawView;
     private FragmentAListener listener;
     public interface  FragmentAListener{
 
@@ -22,7 +22,7 @@ public class FirstFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_first, container,false);
-        customView = v.findViewById(R.id.im_crop_image);
+        drawView = v.findViewById(R.id.im_crop_image);
         return v;
     }
 

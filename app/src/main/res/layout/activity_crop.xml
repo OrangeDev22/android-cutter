@@ -10,7 +10,7 @@
     <include layout="@layout/toolbar"
         android:id="@+id/toolbar"/>
 
-    <com.example.cutter.views.CustomView
+    <com.example.cutter.views.DrawView
         android:id="@+id/im_crop_image"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

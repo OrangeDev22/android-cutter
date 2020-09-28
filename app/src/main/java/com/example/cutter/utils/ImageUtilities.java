@@ -4,6 +4,8 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Matrix;
 
+import java.io.ByteArrayOutputStream;
+
 public class ImageUtilities {
     public ImageUtilities(){
 
@@ -77,5 +79,11 @@ public class ImageUtilities {
             }
         }
         return Bitmap.createBitmap(source, firstX, firstY, lastX - firstX, lastY - firstY);
+    }
+    public static  byte[] bitmapToArray(Bitmap bitmap){
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG, 50,stream);
+        byte[] byteArray = stream.toByteArray();
+        return  byteArray;
     }
 }

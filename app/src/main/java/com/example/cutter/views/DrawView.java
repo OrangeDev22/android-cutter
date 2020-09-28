@@ -11,6 +11,8 @@ import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.graphics.drawable.BitmapDrawable;
+import android.os.AsyncTask;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -20,11 +22,14 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.example.cutter.CropModel;
+import com.example.cutter.utils.ImageUtilities;
 
 import java.io.ByteArrayOutputStream;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 
-public class CustomView extends androidx.appcompat.widget.AppCompatImageView {
+public class DrawView extends androidx.appcompat.widget.AppCompatImageView {
+    private static final float COLOR_TOLERANCE = 20;
     int mStartX;
     int mStartY;
     int mEndX;
@@ -52,22 +57,22 @@ public class CustomView extends androidx.appcompat.widget.AppCompatImageView {
     private RectF rectF;
     public Bitmap bitmap,mainBitmap;
     Context finalContext;
-    final int rectMode = 0, circleMode = 1,freeStyle=2;
+    final int rectMode = 0, circleMode = 1,freeStyle=2,autoClearMode=3;
     int mode=0;
     private onImageCroppedListener onImageCroppedListener;
-    public CustomView(@NonNull Context context) {
+    public DrawView(@NonNull Context context) {
         super(context);
         finalContext = context;
 
         init(null);
     }
 
-    public CustomView(@NonNull Context context, @Nullable AttributeSet attrs) {
+    public DrawView(@NonNull Context context, @Nullable AttributeSet attrs) {
        this(context,attrs,0);
        finalContext = context;
     }
 
-    public CustomView(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+    public DrawView(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         finalContext = context;
         cropModelArrayList = new ArrayList<>();
@@ -129,42 +134,13 @@ public class CustomView extends androidx.appcompat.widget.AppCompatImageView {
                else{
                    canvas.drawColor(Color.TRANSPARENT);
                }
-                /*if (System.currentTimeMillis() - lastTouchDown < CLICK_ACTION_THRESHHOLD) {
 
-                    cropModelArrayList.clear();
-                    int cx = (screen_width - bmp.getWidth()) >> 1;
-                    int cy = (screen_height - bmp.getHeight()) >> 1;
-                    canvas.drawBitmap(bmp, cx, cy, null);
-                    im_crop_image_view.setImageBitmap(alteredBitmap);
-
-                } else {
-                    if (upx != upy) {
-                        upx = event.getX();
-                        upy = event.getY();
-
-
-                        canvas.drawLine(downx, downy, upx, upy, paint);
-                        clipPath.lineTo(upx, upy);
-                        im_crop_image_view.invalidate();
-
-                        crop();
-                    }
-
-                }*/
                 break;
         }
 
     }
 
-   /* @Override
-    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
-        width = w;
-        height = h;
-        float strokeWidth = (int)(width*0.00694);
-        Log.e("stroke width",strokeWidth+"");
-        mPaint.setStrokeWidth(strokeWidth);
-        super.onSizeChanged(w, h, oldw, oldh);
-    }*/
+
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
@@ -193,7 +169,7 @@ public class CustomView extends androidx.appcompat.widget.AppCompatImageView {
                     mStartY = (int) event.getY();
                     rectF = new RectF();
                 }
-                else{
+                else if(mode == freeStyle){
                     downx = event.getX();
                     downy = event.getY();
                     clipPath = new android.graphics.Path();
@@ -206,7 +182,10 @@ public class CustomView extends androidx.appcompat.widget.AppCompatImageView {
                     largey = downy;
                     lastTouchDown = System.currentTimeMillis();
                 }
-
+                else{
+                    startAutoClear(event.getX(),event.getY());
+                    Log.e("Mode status","entered auto clear");
+                }
                 drawing = true;
                 break;
 
@@ -241,28 +220,25 @@ public class CustomView extends androidx.appcompat.widget.AppCompatImageView {
                     Log.e("rect dimensions",rect.width()+"x"+rect.height());
                     if(verifyShape()){
                         Bitmap outPut = cropImage(bitmap);
-                        onImageCroppedListener.onImageCropped(bitmapToArray(outPut));
+                        onImageCroppedListener.onImageCropped(ImageUtilities.bitmapToArray(outPut));
                     }
                     else{
                         Log.e("Shape status","Shape dimensions are null");
                     }
                 }
-                else{
+                else if(mode == freeStyle){
 
                     upx = event.getX();
                     upy = event.getY();
                     Bitmap outPut = cropImageFreeStyle(bitmap);
-                    onImageCroppedListener.onImageCropped(bitmapToArray(outPut));
+                    onImageCroppedListener.onImageCropped(ImageUtilities.bitmapToArray(outPut));
                     cropModelArrayList.clear();
 
                 }
+                else{
+
+                }
                 drawing = false;
-               /* Intent intent = new Intent(getContext(), DisplayActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                intent.putExtra("bitmap_cropped",byteArray);
-                invalidate();
-                final Context contextFinal = CustomView.this.getContext();
-                contextFinal.startActivity(intent);*/
                 break;
 
             default:
@@ -277,22 +253,9 @@ public class CustomView extends androidx.appcompat.widget.AppCompatImageView {
     public void setBitmap(Bitmap bitmap){
         this.bitmap = bitmap;
     }
-    public void setMainBitmap(Bitmap bitmap){
-        mainBitmap = bitmap;
 
-    }
-    private byte[] bitmapToArray(Bitmap bitmap){
-        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.PNG, 50,stream);
-        byte[] byteArray = stream.toByteArray();
-        invalidate();
-        return  byteArray;
-    }
+
     private Bitmap cropImage(@NonNull Bitmap bitmap){
-        int width = bitmap.getWidth();
-        int height = bitmap.getHeight();
-        /*int width = rect.width();
-        int height = rect.height();*/
         int cx = (this.width- bitmap.getWidth()) >> 1; // same as (...) / 2
         int cy = (this.height - bitmap.getHeight()) >> 1;
         //Log.e("dimenssions in customview",this.width+"xDD"+this.height);
@@ -315,16 +278,6 @@ public class CustomView extends androidx.appcompat.widget.AppCompatImageView {
             canvas.drawRect(mStartX,mStartY,mEndX,mEndY,paint);
             paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
             canvas.drawBitmap(this.bitmap,cx,cy,paint);
-            //canvas.drawRect(Math.min(mStartX, mEndX),Math.min(mStartY,mEndY),Math.max(mEndX,mStartX),Math.max(mEndY,mStartY),paint);
-            //
-
-            //canvas.drawRect(mStartX,mStartY,mEndX,mEndY,paint);
-            //Log.e("las time in crop", rect.width()+"x"+rect.height());
-            //canvas.drawRect(rect, paint);
-            //paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
-            int cy2 = (rect.height()-bitmap.getHeight()) >> 1;
-
-            //canvas.drawColor(Color.RED);
         }
         else{
             canvas.drawOval(rectF,paint);
@@ -371,12 +324,7 @@ public class CustomView extends androidx.appcompat.widget.AppCompatImageView {
                 largey=cropModelArrayList.get(i).getX();
             }
         }
-        //Bitmap output = bitmap;
 
-        /*Paint cpaint = new Paint();
-       cpaint.setAntiAlias(true);
-        cpaint.setColor(getResources().getColor(R.color.colorAccent));
-        cpaint.setAlpha(100);*/
         canvas.drawPath(clipPath, paint);
         paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
         canvas.drawBitmap(bitmap, 0, 0, paint);
@@ -405,5 +353,64 @@ public class CustomView extends androidx.appcompat.widget.AppCompatImageView {
         }
         return validation;
     }
+    public void startAutoClear(float x, float y){
+        Log.e("Async status","starting async");
+        AutomaticPixelClearingTask automaticPixelClearingTask = new AutomaticPixelClearingTask(this);
+        automaticPixelClearingTask.execute((int)x, (int)y);
 
+    }
+    private static class AutomaticPixelClearingTask extends AsyncTask<Integer, Void, Bitmap> {
+        private WeakReference<DrawView> drawViewWeakReference;
+        AutomaticPixelClearingTask(DrawView drawView){
+            this.drawViewWeakReference = new WeakReference<>(drawView);
+        }
+        @Override
+        protected void onPreExecute(){
+            Log.e("Async status","pre execute");
+            super.onPreExecute();
+
+        }
+        @Override
+        protected Bitmap doInBackground(Integer... points) {
+            Log.e("Async status","do in background");
+            Bitmap oldBitmap = drawViewWeakReference.get().bitmap;
+            int colorToReplace = oldBitmap.getPixel(points[0], points[1]);
+            int width = oldBitmap.getWidth();
+            int height = oldBitmap.getHeight();
+            int[] pixels = new int[width*height];
+            oldBitmap.getPixels(pixels,0,width,0,0,width,height);
+            int rA = Color.alpha(colorToReplace);
+            int rR = Color.red(colorToReplace);
+            int rG = Color.green(colorToReplace);
+            int rB = Color.blue(colorToReplace);
+            int pixel;
+
+            for (int y = 0; y< height;++y){
+                for (int x = 0; x < width; ++x){
+                    int index = y*width+x;
+                    pixel = pixels[index];
+                    int rrA = Color.alpha(pixel);
+                    int rrR = Color.red(pixel);
+                    int rrG = Color.green(pixel);
+                    int rrB = Color.blue(pixel);
+                    if (rA - COLOR_TOLERANCE < rrA && rrA < rA + COLOR_TOLERANCE && rR - COLOR_TOLERANCE < rrR && rrR < rR + COLOR_TOLERANCE &&
+                            rG - COLOR_TOLERANCE < rrG && rrG < rG + COLOR_TOLERANCE && rB - COLOR_TOLERANCE < rrB && rrB < rB + COLOR_TOLERANCE) {
+                        pixels[index] = Color.TRANSPARENT;
+                    }
+                }
+            }
+
+            Bitmap newBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+            newBitmap.setPixels(pixels, 0, width, 0, 0, width, height);
+            return newBitmap;
+        }
+
+        @Override
+        protected void onPostExecute(Bitmap outPut) {
+            super.onPostExecute(outPut);
+            Log.e("Async status","post execute");
+            BitmapDrawable drawable = new BitmapDrawable(drawViewWeakReference.get().finalContext.getResources(),outPut);
+            drawViewWeakReference.get().onImageCroppedListener.onImageCropped(ImageUtilities.bitmapToArray(outPut));
+        }
+    }
 }

@@ -49,7 +49,7 @@ import androidx.core.content.FileProvider;
 
 import com.example.cutter.adapters.IconMenuAdapter;
 import com.example.cutter.utils.ImageUtilities;
-import com.example.cutter.views.CustomView;
+import com.example.cutter.views.DrawView;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.skydoves.powermenu.CustomPowerMenu;
 import com.skydoves.powermenu.MenuAnimation;
@@ -59,8 +59,8 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 
-public class CropActivity extends AppCompatActivity implements PopupMenu.OnMenuItemClickListener, CustomView.onImageCroppedListener{
-    CustomView im_crop_image;
+public class CropActivity extends AppCompatActivity implements PopupMenu.OnMenuItemClickListener, DrawView.onImageCroppedListener{
+    DrawView im_crop_image;
     android.graphics.Path clipPath;
     Bitmap bmp;
     Bitmap alteredBitmap;
@@ -76,8 +76,6 @@ public class CropActivity extends AppCompatActivity implements PopupMenu.OnMenuI
     private boolean cropped= false;
     private HandlerThread handlerThread = new HandlerThread("HandlerThread");
     private Handler threadHandler;
-    private static final String TAG = "CropActivity";
-   // private static ShowDialogRunnable showDialogRunnable;
     private ProgressDialog dialog;
     private boolean trimming = false;
     private String dataType="";
@@ -197,6 +195,15 @@ public class CropActivity extends AppCompatActivity implements PopupMenu.OnMenuI
 
     private void init(){
         toolbar = findViewById(R.id.toolbar);
+        customPowerMenu = new CustomPowerMenu.Builder<>(this, new IconMenuAdapter())
+                .addItem(new IconPowerMenuItem(ContextCompat.getDrawable(this, R.drawable.ic_baseline_image_24),"Image"))
+                .addItem(new IconPowerMenuItem(ContextCompat.getDrawable(this, R.drawable.ic_baseline_camera_alt_24),"Camera"))
+                .setOnMenuItemClickListener(onIconMenuItemClickListener)
+                .setAnimation(MenuAnimation.SHOWUP_BOTTOM_LEFT)
+                //setMenuRadius(10f)
+                .setMenuShadow(10f)
+                .setWidth(screen_width)
+                .build();
         setSupportActionBar(toolbar);
         pDialog = new ProgressDialog(CropActivity.this);
         //selectImage = findViewById(R.id.buttonSelectPicture);
@@ -275,6 +282,11 @@ public class CropActivity extends AppCompatActivity implements PopupMenu.OnMenuI
                 case R.id.bottomCropFree:
                     im_crop_image.setMode(2);
                     break;
+                case R.id.bottomCropSelectAll:
+                    im_crop_image.setMode(3);
+                    Toast.makeText(getBaseContext(),"Please click on the area you want to delete",Toast.LENGTH_LONG).show();
+                    //im_crop_image.startAutoClear(0,0);
+                    break;
             }
             return true;
         }
@@ -285,15 +297,7 @@ public class CropActivity extends AppCompatActivity implements PopupMenu.OnMenuI
         popupMenu.inflate(R.menu.popup_select_item_menu);
         popupMenu.show();*/
 
-        customPowerMenu = new CustomPowerMenu.Builder<>(this, new IconMenuAdapter())
-                .addItem(new IconPowerMenuItem(ContextCompat.getDrawable(this, R.drawable.ic_baseline_image_24),"Image"))
-                .addItem(new IconPowerMenuItem(ContextCompat.getDrawable(this, R.drawable.ic_baseline_camera_alt_24),"Camera"))
-                .setOnMenuItemClickListener(onIconMenuItemClickListener)
-                .setAnimation(MenuAnimation.SHOWUP_BOTTOM_LEFT)
-                //setMenuRadius(10f)
-                .setMenuShadow(10f)
-                .setWidth(screen_width)
-                .build();
+
         Log.e("bottom nav height",bottomNav.getHeight()+"x"+customPowerMenu.getContentViewHeight());
         WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
         customPowerMenu.showAsDropDown(bottomNav,
@@ -506,10 +510,13 @@ public class CropActivity extends AppCompatActivity implements PopupMenu.OnMenuI
             //activity.bitmapToImageView(bitmap);
             activity.canvas.drawBitmap(bitmap,cx,cy,null);
             Log.e("bitmap dimensions after trimming",bitmap.getWidth()+"x"+bitmap.getHeight());
-            Drawable drawable = new BitmapDrawable(activity.getResources(),activity.alteredBitmap);
-            activity.im_crop_image.setBackground(drawable);
+            //Drawable drawable = new BitmapDrawable(activity.getResources(),activity.alteredBitmap);
+            //activity.im_crop_image.setBackground(drawable);
             activity.dialog.dismiss();
             activity.trimming = false;
+            Intent intent = new Intent(activity, EditorActivity.class);
+            intent.putExtra("bitmap_CropActivity",ImageUtilities.bitmapToArray(activity.alteredBitmap));
+            activity.startActivity(intent);
         }
 
         @Override
@@ -599,33 +606,7 @@ public class CropActivity extends AppCompatActivity implements PopupMenu.OnMenuI
         }*/
         im_crop_image.setBackground(drawable);
     }
-    private Bitmap scaleBitmap(Bitmap bm) {
-        int width = bm.getWidth();
-        int height = bm.getHeight();
-        int maxHeight = (int) (screen_height*0.55);
-        Log.v("Pictures", "Width and height are " + width + "--" + height);
 
-        if (width > height) {
-            // landscape
-            float ratio = (float) width / screen_width;
-            width = screen_width;
-            height = (int)(height / ratio);
-        } else if (height > width) {
-            // portrait
-            float ratio = (float) height / maxHeight;
-            height = maxHeight;
-            width = (int)(width / ratio);
-        } else {
-            // square
-            height = screen_height;
-            width = screen_width;
-        }
-
-        Log.v("Pictures", "after scaling Width and height are " + width + "--" + height);
-
-        bm = Bitmap.createScaledBitmap(bm, width, height, true);
-        return bm;
-    }
     private Matrix scaleImage(Bitmap bitmap){
         float originalWidth = bitmap.getWidth();
         float originalHeight = bitmap.getHeight();
