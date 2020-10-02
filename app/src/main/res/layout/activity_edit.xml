@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="@color/background"
     tools:context=".EditActivity">
-    <LinearLayout
+    <!--<LinearLayout
         android:id="@+id/workArea"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -24,7 +24,7 @@
         </com.shashi.mysticker.StickerView>
 
 
-    </LinearLayout>
+    </LinearLayout>-->
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNavigationViewEditImage"
         android:layout_width="match_parent"

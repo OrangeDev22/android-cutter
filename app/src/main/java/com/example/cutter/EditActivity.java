@@ -29,21 +29,21 @@ import com.shashi.mysticker.StickerView;
 
 public class EditActivity extends AppCompatActivity {
     Bitmap bitmap;
-    StickerView stickerView;
+    //StickerView stickerView;
     BottomNavigationView bottomNavigationView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit);
-        stickerView = findViewById(R.id.sticker_view);
+        //stickerView = findViewById(R.id.sticker_view);
         bottomNavigationView = findViewById(R.id.bottomNavigationViewEditImage);
         bottomNavigationView.setOnNavigationItemSelectedListener(navListener);
         String imagePath = getIntent().getExtras().getString("bitmap_FilterActivity");
         bitmap = ImageUtilities.decodeImage(imagePath);
         BitmapDrawable drawable = new BitmapDrawable(getResources(), bitmap);
-        stickerView.setBackground(drawable);
+       /* stickerView.setBackground(drawable);
         stickerView.getLayoutParams().height = bitmap.getHeight();
-        stickerView.getLayoutParams().width = bitmap.getWidth();
+        stickerView.getLayoutParams().width = bitmap.getWidth();*/
     }
     private BottomNavigationView.OnNavigationItemSelectedListener navListener = new BottomNavigationView.OnNavigationItemSelectedListener() {
         @Override
