@@ -51,7 +51,7 @@ public class DrawView extends androidx.appcompat.widget.AppCompatImageView {
     //
     private float angle;
     Paint mPaint = new Paint();
-    int mSelectedColor = Color.parseColor("#0099ff");
+    int mSelectedColor = Color.parseColor("#bb86fc");
     boolean drawing = false;
     public Rect rect;
     private RectF rectF;
@@ -97,12 +97,7 @@ public class DrawView extends androidx.appcompat.widget.AppCompatImageView {
                 rect.top = mStartY;
                 rect.right = mEndX;
                 rect.bottom = mEndY;
-                Log.e("las time in draw", mStartX+"x"+mStartY+"x"+mEndX+"x"+mEndY);
-                //Log.e("las time in draw", rect.width()+"x"+rect.height());
-                //rect = new Rect(Math.min(mStartX, mEndX),Math.min(mStartY,mEndY),Math.max(mEndX,mStartX),Math.max(mEndY,mStartY));
                 if(drawing){
-                    //canvas.drawRect(mStartX,mStartY,Math.max(mEndX,mStartX),Math.max(mEndY,mStartY),mPaint);
-                    //Log.e("las time in draw", rect.width()+"x"+rect.height());
                    canvas.drawRect(rect, mPaint);
                 }
                 else{
@@ -331,7 +326,7 @@ public class DrawView extends androidx.appcompat.widget.AppCompatImageView {
         return  output;
     }
     public interface  onImageCroppedListener{
-        void onImageCropped(byte[] bytes);
+        void onImageCropped(ByteArrayOutputStream bytes);
     }
     public void setOnImageCroppedListener(onImageCroppedListener onImageCroppedListener){
         this.onImageCroppedListener = onImageCroppedListener;

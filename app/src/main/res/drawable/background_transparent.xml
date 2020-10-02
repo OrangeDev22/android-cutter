@@ -2,6 +2,6 @@
     android:padding="10dp"
     android:shape="rectangle" >
 
-    <solid android:color="#30efefee" />
+    <solid android:color="#301b1d21" />
 
 </shape>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/../LogoMaker.iml" filepath="$PROJECT_DIR$/../LogoMaker.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../app/app.iml" filepath="$PROJECT_DIR$/../app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../chartboost/chartboost.iml" filepath="$PROJECT_DIR$/../chartboost/chartboost.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../imageeditlibrary/imageeditlibrary.iml" filepath="$PROJECT_DIR$/../imageeditlibrary/imageeditlibrary.iml" />
+      <module fileurl="file://$PROJECT_DIR$/mysticker.iml" filepath="$PROJECT_DIR$/mysticker.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../photoeditor/photoeditor.iml" filepath="$PROJECT_DIR$/../photoeditor/photoeditor.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../photoeditor2/photoeditor2.iml" filepath="$PROJECT_DIR$/../photoeditor2/photoeditor2.iml" />
+    </modules>
+  </component>
+</project>

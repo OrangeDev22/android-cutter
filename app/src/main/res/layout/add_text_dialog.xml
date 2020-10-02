@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/transparent"
+
+    >
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+
+    </LinearLayout>
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/bottomMenu"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/bottomOptions"
+        android:background="@color/colorPrimaryDark"
+        android:orientation="horizontal"
+        android:clickable="true"
+        android:focusable="true"
+        tools:listitem="@layout/text_tools_layout"
+        android:layout_alignWithParentIfMissing="true"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+
+    <LinearLayout
+        android:id="@+id/linearLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/editTextInput"
+        android:layout_marginTop="88dp"
+        android:layout_centerHorizontal="true"
+        android:gravity="center"
+
+        >
+        <com.example.cutter.views.CustomTextViewOutline
+            android:id="@+id/add_text_edit_text2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="4dp"
+            android:textAlignment="center"
+            android:text="Text Example"
+            android:textSize="40sp"
+            />
+    </LinearLayout>
+    <EditText
+        android:id="@+id/editTextInput"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/transparent"
+        android:textColor="@color/transparent"
+        android:textSelectHandle="@drawable/texthandle"
+        android:cursorVisible="false"
+        app:layout_constraintBottom_toTopOf="@+id/linearLayout" />
+
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/bottomOptions"
+        android:layout_width="match_parent"
+        android:layout_height="260dp"
+        android:layout_alignWithParentIfMissing="true"
+        android:background="#252525"
+        android:layout_above="@id/seekBarAlpha"
+         />
+    <SeekBar
+        android:id="@+id/seekBarOutline"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:background="@drawable/track"
+        android:layout_toRightOf="@id/imageViewSize"
+        android:layout_alignParentBottom="true"
+        android:progressDrawable="@drawable/track"
+        />
+
+    <SeekBar
+        android:id="@+id/seekBarAlpha"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:background="@drawable/track"
+        android:layout_alignWithParentIfMissing="true"
+        android:layout_toRightOf="@id/imageViewTransparency"
+        android:layout_above="@id/seekBarOutline"
+
+        android:progressDrawable="@drawable/track"
+        app:layout_constraintStart_toEndOf="@+id/imageViewTransparency" />
+
+    <ImageView
+        android:id="@+id/imageViewSize"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+
+        android:layout_alignParentBottom="true"
+        android:padding="8dp"
+        android:background="@color/colorAccent" />
+
+    <ImageView
+        android:id="@+id/imageViewTransparency"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:padding="8dp"
+        android:layout_alignWithParentIfMissing="true"
+        android:background="@color/colorAccent"
+        android:layout_above="@id/imageViewSize" />
+
+
+</RelativeLayout>
