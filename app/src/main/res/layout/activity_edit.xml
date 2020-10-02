@@ -9,16 +9,17 @@
     <LinearLayout
         android:id="@+id/workArea"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"
         >
         <com.shashi.mysticker.StickerView
             android:id="@+id/sticker_view"
+
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            app:showBorder="true"
-            app:showIcons="true">
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true">
 
         </com.shashi.mysticker.StickerView>
 

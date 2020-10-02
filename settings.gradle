@@ -1,3 +1,2 @@
-include ':mysticker'
 include ':app'
 rootProject.name = "Cutter"

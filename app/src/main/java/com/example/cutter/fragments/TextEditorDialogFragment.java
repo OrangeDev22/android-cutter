@@ -3,6 +3,7 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
@@ -15,6 +16,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
@@ -36,6 +38,8 @@ import com.example.cutter.R;
 import com.example.cutter.adapters.FontsAdapter;
 import com.example.cutter.adapters.TextToolsAdapter;
 import com.example.cutter.views.CustomTextViewOutline;
+import com.madrapps.pikolo.ColorPicker;
+import com.madrapps.pikolo.listeners.SimpleColorSelectionListener;
 
 
 import java.util.ArrayList;
@@ -118,7 +122,8 @@ public class TextEditorDialogFragment extends DialogFragment implements FontsAda
                 mEditingToolsAdapter.setSelectedTool(1);
                 break;
             case "COLOR":
-                displayMetrics = new DisplayMetrics();
+                openColorPicker();
+                /*displayMetrics = new DisplayMetrics();
                 ((Activity)mContext).getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
                 deviceheihgt = displayMetrics.heightPixels;
                 perccentage = deviceheihgt*0.35;
@@ -137,7 +142,7 @@ public class TextEditorDialogFragment extends DialogFragment implements FontsAda
                 imageTransparency.setVisibility(View.VISIBLE);
                 isColorSelected=true;
                 seekBarAlpha.setProgress(colorProgress);
-                mEditingToolsAdapter.setSelectedTool(2);
+                mEditingToolsAdapter.setSelectedTool(2);*/
                 break;
             case "STYLE":
 
@@ -255,9 +260,9 @@ public class TextEditorDialogFragment extends DialogFragment implements FontsAda
 
         DisplayMetrics displayMetrics = new DisplayMetrics();
         ((Activity)mContext).getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
-        int devicewidth = displayMetrics.widthPixels;
-        int deviceHeight = displayMetrics.heightPixels;
-        Log.d("DEVICE MEASURE", devicewidth+"x"+deviceHeight);
+       // int devicewidth = displayMetrics.widthPixels;
+        //int deviceHeight = displayMetrics.heightPixels;
+        //Log.d("DEVICE MEASURE", devicewidth+"x"+deviceHeight);
 
         mEditingToolsAdapter  = new TextToolsAdapter( this, mContext);
         fontPosition = 0;
@@ -410,5 +415,32 @@ public class TextEditorDialogFragment extends DialogFragment implements FontsAda
             }
         });
         mEditingToolsAdapter.setSelectedTool(0);
+    }
+    private void openColorPicker(){
+        WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        final Dialog dialog = new Dialog(mContext);
+        //context.getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.color_picker_dialog);
+        int height = displayMetrics.heightPixels;
+        final ImageView imageView = dialog.findViewById(R.id.previewColor);
+        final ColorPicker colorPicker = dialog.findViewById(R.id.colorPicker);
+        //imageView.getBackground().setColorFilter(mDefaultColor, PorterDuff.Mode.MULTIPLY);
+        colorPicker.setColorSelectionListener(new SimpleColorSelectionListener(){
+            @Override
+            public void onColorSelected(int color) {
+                super.onColorSelected(color);
+                //mDefaultColor = color;
+                //mphotoEditor.setBackgroundColor(mDefaultColor);
+                imageView.getBackground().setColorFilter(color, PorterDuff.Mode.MULTIPLY);
+            }
+        });
+        /*lp.copyFrom(dialog.getWindow().getAttributes());
+        lp.width = WindowManager.LayoutParams.MATCH_PARENT;
+        lp.height = (int)(height*0.5);*/
+        dialog.show();
+       // dialog.getWindow().setAttributes(lp);
+        dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
     }
 }
