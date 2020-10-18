@@ -13,11 +13,17 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.LightingColorFilter;
 import android.graphics.Matrix;
+import android.graphics.Paint;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
 import android.net.Uri;
 import android.provider.MediaStore;
+import android.renderscript.Allocation;
+import android.renderscript.Element;
+import android.renderscript.RenderScript;
+import android.renderscript.ScriptIntrinsicConvolve3x3;
+import android.util.Log;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -195,6 +201,60 @@ public class BitmapUtils {
         catch (IOException e){
             e.printStackTrace();
             return null;
+        }
+    }
+    public static Bitmap doSharpen(Bitmap original, float[] radius,Context context) {
+        Bitmap bitmap = Bitmap.createBitmap(
+                original.getWidth(), original.getHeight(),
+                Bitmap.Config.ARGB_8888);
+
+        RenderScript rs = RenderScript.create(context);
+
+        Allocation allocIn = Allocation.createFromBitmap(rs, original);
+        Allocation allocOut = Allocation.createFromBitmap(rs, bitmap);
+
+        ScriptIntrinsicConvolve3x3 convolution
+                = ScriptIntrinsicConvolve3x3.create(rs, Element.U8_4(rs));
+        convolution.setInput(allocIn);
+        convolution.setCoefficients(radius);
+        convolution.forEach(allocOut);
+
+        allocOut.copyTo(bitmap);
+        rs.destroy();
+
+        return bitmap;
+    }
+    public static Bitmap getBitmapFromAsset(Context context, String filePath) {
+        AssetManager assetManager = context.getAssets();
+        InputStream istr;
+        Bitmap bitmap = null;
+        try {
+            istr = assetManager.open(filePath);
+            bitmap = BitmapFactory.decodeStream(istr);
+        } catch (IOException e) {
+            // handle exception
+        }
+
+        return bitmap;
+    }
+    public static Bitmap scaleBitmap(Bitmap image, int maxWidth, int maxHeight) {
+        if (maxHeight > 0 && maxWidth > 0) {
+            int width = image.getWidth();
+            int height = image.getHeight();
+            float ratioBitmap = (float) width / (float) height;
+            float ratioMax = (float) maxWidth / (float) maxHeight;
+
+            int finalWidth = maxWidth;
+            int finalHeight = maxHeight;
+            if (ratioMax > ratioBitmap) {
+                finalWidth = (int) ((float)maxHeight * ratioBitmap);
+            } else {
+                finalHeight = (int) ((float)maxWidth / ratioBitmap);
+            }
+            image = Bitmap.createScaledBitmap(image, finalWidth, finalHeight, true);
+            return image;
+        } else {
+            return image;
         }
     }
 }

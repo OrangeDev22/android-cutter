@@ -16,17 +16,18 @@ import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.cutter.FilterListFragment;
-import com.example.cutter.Interface.FiltersListFragmentListener;
 import com.example.cutter.R;
+import com.zomato.photofilters.imageprocessors.Filter;
 import com.zomato.photofilters.utils.ThumbnailItem;
 
 import java.util.List;
 
-public class ThumbnailAdapter extends RecyclerView.Adapter<ThumbnailAdapter.MyViewHolder> {
+public class ThumbnailAdapter extends RecyclerView.Adapter<ThumbnailAdapter.ViewHolder> {
     private static final String TAG = "THUMBNAILS_ADAPTER";
     private List <ThumbnailItem> thumbnailItems;
-    private FiltersListFragmentListener listener;
+    public FiltersListFragmentListener listener;
     private Context context;
+
     private int selectedIndext = 0;
 
     public ThumbnailAdapter(List<ThumbnailItem> thumbnailItems, FiltersListFragmentListener listener, Context context) {
@@ -37,34 +38,33 @@ public class ThumbnailAdapter extends RecyclerView.Adapter<ThumbnailAdapter.MyVi
 
     @NonNull
     @Override
-    public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(context).inflate(R.layout.thubmnail_item,parent, false);
-        return new MyViewHolder(itemView);
+        return new ViewHolder(itemView);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull MyViewHolder holder, final int position) {
+    public void onBindViewHolder(@NonNull ViewHolder holder, final int position) {
         Log.v(TAG, "On Bind View Called");
         final ThumbnailItem thumbnailItem = thumbnailItems.get(position);
         BitmapDrawable drawable = new BitmapDrawable(context.getResources(), thumbnailItem.image);
-        holder.thumbnail.setBackground(drawable);
         //holder.thumbnail.setScaleType(ImageView.ScaleType.FIT_START);
-
+        holder.filter_name.setText(thumbnailItem.filterName);
         holder.thumbnail.setOnClickListener(new View.OnClickListener(){
 
             @Override
             public void onClick(View v) {
-                listener.onFilterSelected(thumbnailItem.filter);
-                selectedIndext = position;
-                notifyDataSetChanged();
+                listener.onFilterSelected(position,thumbnailItems.get(position).filter);
+                //notifyDataSetChanged();
             }
         });
-        holder.filter_name.setText(thumbnailItem.filterName);
         if(selectedIndext == position){
             holder.filter_name.setTextColor(ContextCompat.getColor(context, R.color.colorAccent));
+            holder.thumbnail.setBackground(drawable);
         }
         else{
             holder.filter_name.setTextColor(ContextCompat.getColor(context, R.color.white));
+            holder.thumbnail.setBackground(drawable);
         }
     }
 
@@ -72,14 +72,29 @@ public class ThumbnailAdapter extends RecyclerView.Adapter<ThumbnailAdapter.MyVi
     public int getItemCount() {
         return thumbnailItems.size();
     }
-
-    public class MyViewHolder extends RecyclerView.ViewHolder{
-        ImageView thumbnail;
+    public interface OnItemSelected{
+        void onFilterSelected(int position);
+    }
+    public  class ViewHolder extends RecyclerView.ViewHolder{
+        public ImageView thumbnail;
         TextView filter_name;
-        public MyViewHolder(View itemView){
+        public ViewHolder(View itemView){
             super(itemView);
             thumbnail = (ImageView) itemView.findViewById(R.id.thumbnail);
             filter_name = (TextView)itemView.findViewById(R.id.filter_name);
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                }
+            });
         }
+    }
+    public void setSelectedFilter(int position){
+        selectedIndext = position;
+        notifyDataSetChanged();
+    }
+    public interface  FiltersListFragmentListener  {
+        void onFilterSelected(int position, Filter filter);
     }
 }

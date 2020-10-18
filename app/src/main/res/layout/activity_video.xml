@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background"
+    tools:context=".VideoActivity">
+    <include layout="@layout/toolbar"
+        android:id="@+id/toolbar_video_activity"/>
+    <LinearLayout
+        android:id="@+id/video_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/bottomLayout"
+        android:layout_alignWithParentIfMissing="true"
+       >
+        <LinearLayout
+            android:id="@+id/workArea"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:gravity="center"
+
+            >
+            <VideoView
+                android:id="@+id/video_view"
+                android:layout_width="match_parent"
+                android:gravity="center"
+                android:layout_gravity="center_vertical"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+
+       <!-- <VideoView
+            android:id="@+id/video_view"
+            android:layout_width="match_parent"
+            android:gravity="center"
+            android:layout_gravity="center_vertical"
+            android:layout_height="wrap_content" />-->
+    </LinearLayout>
+
+     <androidx.constraintlayout.widget.ConstraintLayout
+         android:id="@+id/bottomLayout"
+         android:layout_width="match_parent"
+         android:layout_height="wrap_content"
+         android:layout_alignParentBottom="true">
+
+         <TextView
+             android:id="@+id/text_view_seconds"
+             android:layout_width="wrap_content"
+             android:layout_height="wrap_content"
+             android:background="@color/background"
+             android:text="0 seconds"
+             android:textColor="@color/white"
+             android:layout_marginLeft="15dp"
+             android:textSize="22sp"
+             android:textAlignment="center"
+             app:layout_constraintBottom_toTopOf="@id/seek_bar_time"
+             app:layout_constraintStart_toStartOf="parent" />
+
+         <SeekBar
+             android:id="@+id/seek_bar_time"
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+             android:layout_margin="5dp"
+             android:background="@color/background"
+             android:padding="4dp"
+             android:progressDrawable="@drawable/track"
+             app:layout_constraintBottom_toTopOf="@+id/bottomFramesPreviews"
+             app:layout_constraintLeft_toRightOf="@id/text_view_seconds" />
+
+         <androidx.recyclerview.widget.RecyclerView
+             android:id="@+id/bottomFramesPreviews"
+             android:layout_width="match_parent"
+             android:layout_height="110dp"
+             android:background="@color/colorPrimary"
+             android:orientation="horizontal"
+             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+             tools:listitem="@layout/frame_adapter_item"
+             android:padding="10dp"
+             android:layout_marginBottom="5dp"
+             app:layout_constraintBottom_toBottomOf="parent"
+            />
+     </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+    </RelativeLayout>
+
+
+
+</RelativeLayout>

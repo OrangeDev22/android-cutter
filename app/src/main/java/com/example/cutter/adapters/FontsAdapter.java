@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -44,16 +45,17 @@ public class FontsAdapter extends RecyclerView.Adapter<FontsAdapter.ViewHolder> 
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-
-        holder.txtTool.setText("Logo Maker Font");
         holder.txtTool.setTypeface(mTypefaces.get(position));
-        holder.txtTool.setBackgroundColor(ContextCompat.getColor(mContext, R.color.background));
-        holder.txtTool.setTextColor(ContextCompat.getColor(mContext, R.color.colorAccent));
+        holder.relativeLayout.setBackground(ContextCompat.getDrawable(mContext,R.drawable.rounded_background));
+        holder.txtTool.setTextColor(ContextCompat.getColor(mContext, R.color.white));
+        //If font is selected then background and text color will change
+        holder.txtTool.setTypeface(mTypefaces.get(position));
+
         //If font is selected then background and text color will change
         if (index == position){
             Log.d("Font Position", index+"");
-            holder.txtTool.setBackgroundColor(ContextCompat.getColor(mContext, R.color.colorAccent));
-            holder.txtTool.setTextColor(ContextCompat.getColor(mContext, R.color.black));
+            holder.relativeLayout.setBackground(ContextCompat.getDrawable(mContext,R.drawable.rounded_background_selected));
+            //holder.txtTool.setTextColor(ContextCompat.getColor(mContext, R.color.black));
         }
     }
     //Method Called to change the poisition of the selected font
@@ -68,9 +70,11 @@ public class FontsAdapter extends RecyclerView.Adapter<FontsAdapter.ViewHolder> 
 
     class ViewHolder extends RecyclerView.ViewHolder {
         TextView txtTool;
+        RelativeLayout relativeLayout;
         ViewHolder(View itemView) {
             super(itemView);
             txtTool = itemView.findViewById(R.id.font_textView);
+            relativeLayout = itemView.findViewById(R.id.font_background);
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

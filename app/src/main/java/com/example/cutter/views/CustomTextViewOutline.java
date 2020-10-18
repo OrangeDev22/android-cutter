@@ -2,171 +2,189 @@ package com.example.cutter.views;
 
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Shader;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.AttributeSet;
+import android.util.Log;
+import android.util.TypedValue;
+import android.view.View.BaseSavedState;
+import android.widget.EditText;
 import android.widget.TextView;
 
+import androidx.appcompat.widget.AppCompatEditText;
 import androidx.appcompat.widget.AppCompatTextView;
-
 
 import com.example.cutter.R;
 
 import java.lang.reflect.Field;
-/*
-    Custom View class that will generate the outline in the text editor
- */
-public class CustomTextViewOutline extends AppCompatTextView{
-    private Field colorField;
-    private int textColor;
-    private int outlineColor;
+
+
+public class CustomTextViewOutline  extends EditText {
+
+    private static final int DEFAULT_STROKE_WIDTH = 0;
+
+    // fields
+    private int _strokeColor;
+    private float _strokeWidth;
+    private int _hintStrokeColor;
+    private float _hintStrokeWidth;
+    private boolean isDrawing;
+    private Bitmap altBitmap;
+    private Canvas altCanvas;
 
     public CustomTextViewOutline(Context context) {
         this(context, null);
     }
 
     public CustomTextViewOutline(Context context, AttributeSet attrs) {
-        this(context, attrs, android.R.attr.textViewStyle);
+        this(context, attrs, R.attr.editTextStyle);
     }
 
     public CustomTextViewOutline(Context context, AttributeSet attrs, int defStyleAttr) {
-        super(context, attrs, defStyleAttr);
+        this(context, attrs, defStyleAttr, 0);
+    }
 
-        try {
-            colorField = TextView.class.getDeclaredField("mCurTextColor");
-            colorField.setAccessible(true);
 
-            // If the reflection fails (which really shouldn't happen), we
-            // won't need the rest of this stuff, so we keep it in the try-catch
+    public CustomTextViewOutline(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+        super(context, attrs, defStyleAttr, defStyleRes);
 
-            textColor = getTextColors().getDefaultColor();
+        if(attrs != null) {
+            TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.StrokedTextAttrs);
+            _strokeColor = a.getColor(R.styleable.StrokedTextAttrs_textStrokeColor,
+                    getCurrentTextColor());
+            _strokeWidth = a.getFloat(R.styleable.StrokedTextAttrs_textStrokeWidth,
+                    DEFAULT_STROKE_WIDTH);
+            _hintStrokeColor = a.getColor(R.styleable.StrokedTextAttrs_textHintStrokeColor,
+                    getCurrentHintTextColor());
+            _hintStrokeWidth = a.getFloat(R.styleable.StrokedTextAttrs_textHintStrokeWidth,
+                    DEFAULT_STROKE_WIDTH);
 
-            // These can be changed to hard-coded default
-            // values if you don't need to use XML attributes
-
-            TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.CustomTextViewOutline);
-            outlineColor = a.getColor(R.styleable.CustomTextViewOutline_strokeColor, Color.TRANSPARENT);
-            setOutlineStrokeWidth(a.getDimensionPixelSize(R.styleable.CustomTextViewOutline_strokeWidth, 0));
             a.recycle();
+        } else {
+            _strokeColor = getCurrentTextColor();
+            _strokeWidth = DEFAULT_STROKE_WIDTH;
+            _hintStrokeColor = getCurrentHintTextColor();
+            _hintStrokeWidth = DEFAULT_STROKE_WIDTH;
         }
-        catch (NoSuchFieldException e) {
-            // Optionally catch Exception and remove print after testing
-            e.printStackTrace();
-            colorField = null;
-        }
+        setStrokeWidth(_strokeWidth);
+        setHintStrokeWidth(_hintStrokeWidth);
     }
 
     @Override
-    public void setTextColor(int color) {
-        // We want to track this ourselves
-        // The super call will invalidate()
-
-        textColor = color;
-        super.setTextColor(color);
+    public void invalidate() {
+        // Ignore invalidate() calls when isDrawing == true
+        // (setTextColor(color) calls will trigger them,
+        // creating an infinite loop)
+        if(isDrawing) return;
+        super.invalidate();
     }
 
-    public void setOutlineColor(int color) {
-        outlineColor = color;
-        invalidate();
+    public void setHintStrokeColor(int color) {
+        _hintStrokeColor = color;
     }
 
-    public void setOutlineWidth(float width) {
-        setOutlineStrokeWidth(width);
-        invalidate();
+    public void setHintStrokeWidth(float width) {
+        //convert values specified in dp in XML layout to
+        //px, otherwise stroke width would appear different
+        //on different screens
+        _hintStrokeWidth = spToPx(getContext(), width);
     }
 
-    private void setOutlineStrokeWidth(float width) {
-        getPaint().setStrokeWidth(width + 1);
+    public void setHintStrokeWidth(int unit, float width) {
+        _hintStrokeWidth = TypedValue.applyDimension(
+                unit, width, getContext().getResources().getDisplayMetrics());
     }
+
+    public void setStrokeColor(int color) {
+        _strokeColor = color;
+    }
+
+    public void setStrokeWidth(float width) {
+        //convert values specified in dp in XML layout to
+        //px, otherwise stroke width would appear different
+        //on different screens
+        _strokeWidth = width;
+    }
+
+    public void setStrokeWidth(int unit, float width) {
+        _strokeWidth = TypedValue.applyDimension(
+                unit, width, getContext().getResources().getDisplayMetrics());
+    }
+
+    // overridden methods
 
     @Override
     protected void onDraw(Canvas canvas) {
-        // If we couldn't get the Field, then we
-        // need to skip this, and just draw as usual
-
-        if (colorField != null) {
-            // Outline
-            setColorField(outlineColor);
-            getPaint().setStyle(Paint.Style.STROKE);
+        boolean paintHint = getHint() != null && getText().length() == 0;
+        if((paintHint && _hintStrokeWidth > 0) || (!paintHint && _strokeWidth > 0)) {
+            isDrawing = true;
+            if(altBitmap == null) {
+                altBitmap = Bitmap.createBitmap(canvas.getWidth(), canvas.getHeight(), Bitmap.Config.ARGB_8888);
+                altCanvas = new Canvas(altBitmap);
+            } else if(altCanvas.getWidth() != canvas.getWidth() ||
+                    altCanvas.getHeight() != canvas.getHeight()) {
+                altBitmap.recycle();
+                altBitmap = Bitmap.createBitmap(canvas.getWidth(), canvas.getHeight(), Bitmap.Config.ARGB_8888);
+                altCanvas.setBitmap(altBitmap);
+            }
+            //draw the fill part of text
             super.onDraw(canvas);
-
-            // Reset for text
-            setColorField(textColor);
-            getPaint().setStyle(Paint.Style.FILL);
-        }
-
-        super.onDraw(canvas);
-    }
-
-    private void setColorField(int color) {
-        // We did the null check in onDraw()
-        try {
-            colorField.setInt(this, color);
-        }
-        catch (IllegalAccessException | IllegalArgumentException e) {
-            // Optionally catch Exception and remove print after testing
-            e.printStackTrace();
-        }
-    }
-
-    // Optional saved state stuff
-
-    @Override
-    public Parcelable onSaveInstanceState() {
-        Parcelable superState = super.onSaveInstanceState();
-        SavedState ss = new SavedState(superState);
-        ss.textColor = textColor;
-        ss.outlineColor = outlineColor;
-        ss.outlineWidth = getPaint().getStrokeWidth();
-        return ss;
-    }
-
-    @Override
-    public void onRestoreInstanceState(Parcelable state) {
-        SavedState ss = (SavedState) state;
-        super.onRestoreInstanceState(ss.getSuperState());
-        textColor = ss.textColor;
-        outlineColor = ss.outlineColor;
-        getPaint().setStrokeWidth(ss.outlineWidth);
-    }
-
-    private static class SavedState extends BaseSavedState {
-        int textColor;
-        int outlineColor;
-        float outlineWidth;
-
-        SavedState(Parcelable superState) {
-            super(superState);
-        }
-
-        private SavedState(Parcel in) {
-            super(in);
-            textColor = in.readInt();
-            outlineColor = in.readInt();
-            outlineWidth = in.readFloat();
-        }
-
-        @Override
-        public void writeToParcel(Parcel out, int flags) {
-            super.writeToParcel(out, flags);
-            out.writeInt(textColor);
-            out.writeInt(outlineColor);
-            out.writeFloat(outlineWidth);
-        }
-
-        public static final Parcelable.Creator<SavedState>
-                CREATOR = new Parcelable.Creator<SavedState>() {
-
-            public SavedState createFromParcel(Parcel in) {
-                return new SavedState(in);
+            //save the text color
+            int currentTextColor = paintHint ? getCurrentHintTextColor() : getCurrentTextColor();
+            //clear alternate canvas
+            altBitmap.eraseColor(Color.TRANSPARENT);
+            //set paint to stroke mode and specify
+            //stroke color and width
+            //Paint p = getPaint();
+            Shader shader = getPaint().getShader();
+            Paint p = getPaint();
+            if(shader != null){
+                  p.setShader(null);
             }
 
-            public SavedState[] newArray(int size) {
-                return new SavedState[size];
+            p.setStyle(Paint.Style.STROKE);
+            if(paintHint) {
+                p.setStrokeWidth(_hintStrokeWidth);
+                setHintTextColor(_hintStrokeColor);
+            } else {
+                p.setStrokeWidth(_strokeWidth);
+                setTextColor(_strokeColor);
             }
-        };
+            Log.e("gradient_status","applying"+shader);
+            //draw text stroke
+
+            super.onDraw(altCanvas);
+            canvas.drawBitmap(altBitmap, 0, 0, null);
+            getPaint().setShader(shader);
+            //revert the color back to the one
+            //initially specified
+            if(paintHint) {
+                setHintTextColor(currentTextColor);
+            } else {
+                setTextColor(currentTextColor);
+            }
+            //set paint to fill mode (restore)
+            p.setStyle(Paint.Style.FILL);
+            isDrawing = false;
+        } else {
+            super.onDraw(canvas);
+        }
+    }
+    protected static int spToPx(Context context, float sp) {
+        final float scale = context.getResources().getDisplayMetrics().scaledDensity;
+
+        return (int) (sp * scale + 0.5f);
+    }
+
+    public Bitmap getAltBitmap(){
+        return altBitmap;
+    }
+    public float getStrokeWidth(){
+        return _strokeWidth;
     }
 }

@@ -2,16 +2,26 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:id="@+id/bottomBackgroundColor"
-        android:title="Background Color"
+        android:id="@+id/bottomFrameColor"
+        android:title="Frame Color"
         android:icon="@drawable/paint_can"
         android:enabled="true"
         />
+    <item
+        android:id="@+id/bottomSticker"
+        android:title="Add Sticker"
+        android:enabled="true"
+        android:icon="@drawable/sticker"/>
     <item
         android:id="@+id/bottomText"
         android:title="Add Text"
         android:enabled="true"
         android:icon="@drawable/ic_baseline_text_fields_24"/>
+    <item
+        android:id="@+id/bottomFrame"
+        android:title="Add Frame"
+        android:enabled="true"
+        android:icon="@drawable/art_frame"/>
 
 
 

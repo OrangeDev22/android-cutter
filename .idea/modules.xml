@@ -2,8 +2,9 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/Cutter.iml" filepath="$PROJECT_DIR$/.idea/modules/Cutter.iml" group="Cutter" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/app.iml" group="Cutter/app" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/Cutter.iml" filepath="$PROJECT_DIR$/.idea/modules/Cutter.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/Cutter.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/Cutter.app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/sticker/Cutter.sticker.iml" filepath="$PROJECT_DIR$/.idea/modules/sticker/Cutter.sticker.iml" />
     </modules>
   </component>
 </project>

@@ -6,28 +6,25 @@
         android:title="Image"
         android:icon="@drawable/ic_baseline_image_24"
         android:enabled="true"
-
-
         />
     <item
         android:id="@+id/bottomCropSquare"
-        android:title="Square"
+        android:title="@string/bottom_crop__menu_square"
         android:enabled="true"
-
         android:icon="@drawable/ic_baseline_crop_square_24"/>
     <item
         android:id="@+id/bottomCropOval"
-        android:title="Oval"
+        android:title="@string/bottom_crop_menu_oval"
         android:enabled="true"
         android:icon="@drawable/ic_baseline_oval_24"/>
     <item
     android:id="@+id/bottomCropFree"
-    android:title="Free"
+    android:title="@string/bottom_crop_menu_free"
     android:enabled="true"
     android:icon="@drawable/ic_baseline_trending_up_24"/>
     <item
         android:id="@+id/bottomCropSelectAll"
-        android:title="Select all"
+        android:title="@string/bottom_crop_menu_select_all"
         android:enabled="true"
         android:icon="@drawable/ic_baseline_border_outer"/>
 

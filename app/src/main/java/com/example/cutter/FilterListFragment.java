@@ -29,7 +29,7 @@ import com.zomato.photofilters.utils.ThumbnailsManager;
 import java.util.ArrayList;
 import java.util.List;
 
- public class FilterListFragment extends Fragment implements  FiltersListFragmentListener {
+ public class FilterListFragment extends Fragment implements  ThumbnailAdapter.FiltersListFragmentListener {
     RecyclerView recyclerView;
     ThumbnailAdapter adapter;
     List<ThumbnailItem> thumbnailItems;
@@ -79,7 +79,7 @@ import java.util.List;
                 Resources r = getResources();
 
                 float px = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, getResources().getDisplayMetrics());
-                thumbImg = ImageUtilities.createSquaredBitmap(bitmap,(int) 700);
+                thumbImg = ImageUtilities.createSquaredBitmap(bitmap,(int) width);
                //thumbImg = ImageUtilities.getResizedBitmap(bitmap,width,height);
                 if(thumbImg == null)
                     return;
@@ -113,9 +113,13 @@ import java.util.List;
     }
 
      @Override
-     public void onFilterSelected(Filter filter) {
+     public void onFilterSelected(int position,Filter filter) {
+         adapter.setSelectedFilter(position);
+         listener.onFilterSelected(filter);
         if(listener!= null){
-            listener.onFilterSelected(filter);
+
         }
      }
+
+
  }

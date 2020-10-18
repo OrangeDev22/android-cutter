@@ -6,16 +6,16 @@
     <TextView
         android:id="@+id/filter_name"
         android:text="FILTER NAME"
-        android:layout_marginBottom="5dp"
-        android:layout_marginTop="5dp"
+        android:layout_marginBottom="@dimen/_2sdp"
+        android:layout_marginTop="@dimen/_2sdp"
         android:layout_gravity="center_horizontal"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
     <ImageView
         android:id="@+id/thumbnail"
-        android:layout_width="80dp"
+        android:layout_width="@dimen/_60sdp"
         android:scaleType="fitXY"
         android:adjustViewBounds="true"
-        android:layout_height="80dp"/>
+        android:layout_height="@dimen/_60sdp"/>
 
 </LinearLayout>

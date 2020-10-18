@@ -2,6 +2,7 @@ package com.example.cutter.views;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.DashPathEffect;
@@ -12,11 +13,14 @@ import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -36,6 +40,7 @@ public class DrawView extends androidx.appcompat.widget.AppCompatImageView {
     int mEndY;
     int width;
     int height;
+    private int viewWidth, viewHeight;
     //FREEE STYLE
     android.graphics.Path clipPath;
     float downx = 0;
@@ -60,7 +65,7 @@ public class DrawView extends androidx.appcompat.widget.AppCompatImageView {
     final int rectMode = 0, circleMode = 1,freeStyle=2,autoClearMode=3;
     int mode=0;
     private onImageCroppedListener onImageCroppedListener;
-    public DrawView(@NonNull Context context) {
+    public DrawView(Context context) {
         super(context);
         finalContext = context;
 
@@ -90,9 +95,10 @@ public class DrawView extends androidx.appcompat.widget.AppCompatImageView {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
+        canvas.drawColor(Color.TRANSPARENT);
        switch (mode){
             case rectMode:
-               rect = new Rect();
+                rect = new Rect();
                 rect.left = mStartX;
                 rect.top = mStartY;
                 rect.right = mEndX;
@@ -126,9 +132,6 @@ public class DrawView extends androidx.appcompat.widget.AppCompatImageView {
                        clipPath.lineTo(upx, upy);
                    }
                }
-               else{
-                   canvas.drawColor(Color.TRANSPARENT);
-               }
 
                 break;
         }
@@ -139,14 +142,17 @@ public class DrawView extends androidx.appcompat.widget.AppCompatImageView {
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
         width = View.MeasureSpec.getSize(widthMeasureSpec);
         height = View.MeasureSpec.getSize(heightMeasureSpec);
+        viewWidth = widthMeasureSpec;
+        viewHeight = heightMeasureSpec;
         float strokeWidth = (int)(width*0.00694);
         //Log.e("stroke width",strokeWidth+"");
         Log.e("Height on custom view",height+"");
         mPaint.setPathEffect(new DashPathEffect(new float[]{15.0f, 15.0f}, 0));
         mPaint.setStrokeWidth(strokeWidth);
-        setMeasuredDimension(width,height);
+        //setMeasuredDimension(widthMeasureSpec,heightMeasureSpec);
     }
 
     @Override
@@ -225,7 +231,7 @@ public class DrawView extends androidx.appcompat.widget.AppCompatImageView {
 
                     upx = event.getX();
                     upy = event.getY();
-                    Bitmap outPut = cropImageFreeStyle(bitmap);
+                    Bitmap outPut = cropImageFreeStyle((bitmap));
                     onImageCroppedListener.onImageCropped(ImageUtilities.bitmapToArray(outPut));
                     cropModelArrayList.clear();
 
@@ -268,19 +274,22 @@ public class DrawView extends androidx.appcompat.widget.AppCompatImageView {
 
         //Rect rectangle = new Rect(0,0,,cy);
 
+        //Rect rectangle = new Rect(0,0,,cy);
+
         if(mode == rectMode){
+            /*canvas.drawBitmap(this.bitmap,cx,0,paint);
+            canvas.drawRect(mStartX,mStartY,mEndX,mEndY,paint);
+            paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));*/
 
             canvas.drawRect(mStartX,mStartY,mEndX,mEndY,paint);
             paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
-            canvas.drawBitmap(this.bitmap,cx,cy,paint);
+            canvas.drawBitmap(this.bitmap,cx,0,paint);
         }
         else{
             canvas.drawOval(rectF,paint);
             paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
             canvas.drawBitmap(bitmap,cx,cy,paint);
         }
-
-
 
         Log.e("BITMAP SIZES","input:"+bitmap.getWidth()+"x"+bitmap.getHeight()+"output: "+output.getWidth()+"x"+output.getHeight());
         return output;
@@ -407,5 +416,16 @@ public class DrawView extends androidx.appcompat.widget.AppCompatImageView {
             BitmapDrawable drawable = new BitmapDrawable(drawViewWeakReference.get().finalContext.getResources(),outPut);
             drawViewWeakReference.get().onImageCroppedListener.onImageCropped(ImageUtilities.bitmapToArray(outPut));
         }
+    }
+
+
+
+    public  int getStatusBarHeight() {
+        int result = 0;
+        int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
+        if (resourceId > 0) {
+            result = getResources().getDimensionPixelSize(resourceId);
+        }
+        return result;
     }
 }

@@ -4,8 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/transparent"
-
     >
 
 
@@ -15,20 +13,41 @@
 
 
     </LinearLayout>
-    <androidx.recyclerview.widget.RecyclerView
+    <ImageView
+        android:id="@+id/image_view_close_dialog"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginLeft="5dp"
+        android:src="@drawable/ic_baseline_close_24"
+        android:layout_marginTop="22dp"/>
+    <include
+        android:id="@+id/topFragmentOptions"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        layout="@layout/top_fragment_options"
+        android:layout_marginTop="22dp"/>
+    <ImageView
+        android:id="@+id/imageViewDone"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:src="@drawable/ic_baseline_check_24"
+        android:layout_alignParentEnd="true"
+        android:layout_marginRight="5dp"
+        android:layout_marginTop="22dp"/>
+    <!--<androidx.recyclerview.widget.RecyclerView
         android:id="@+id/bottomMenu"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_above="@id/bottomOptions"
-        android:background="@color/colorPrimaryDark"
+        android:layout_alignParentTop="true"
+        android:background="@color/transparent"
         android:orientation="horizontal"
         android:clickable="true"
         android:focusable="true"
         tools:listitem="@layout/text_tools_layout"
-        android:layout_alignWithParentIfMissing="true"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
-
-    <LinearLayout
+-->
+    <!--<LinearLayout
         android:id="@+id/linearLayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -47,8 +66,21 @@
             android:text="Text Example"
             android:textSize="40sp"
             />
-    </LinearLayout>
-    <EditText
+    </LinearLayout>-->
+
+    <com.example.cutter.views.CustomTextViewOutline
+        android:id="@+id/add_text_edit_text2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:text="Text Example"
+        android:textAlignment="center"
+        android:textColor="@color/black"
+        android:background="@color/transparent"
+        android:textSize="40sp"
+        />
+
+    <!--<EditText
         android:id="@+id/editTextInput"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -56,56 +88,44 @@
         android:textColor="@color/transparent"
         android:textSelectHandle="@drawable/texthandle"
         android:cursorVisible="false"
-        app:layout_constraintBottom_toTopOf="@+id/linearLayout" />
-
+        app:layout_constraintBottom_toTopOf="@+id/linearLayout" />-->
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/bottomOptions"
+        android:id="@+id/bottomFonts"
         android:layout_width="match_parent"
-        android:layout_height="260dp"
-        android:layout_alignWithParentIfMissing="true"
-        android:background="#252525"
-        android:layout_above="@id/seekBarAlpha"
-         />
-    <SeekBar
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="30dp"
+        android:layout_alignParentBottom="true"/>
+    <com.example.cutter.views.VerticalSeekBar
         android:id="@+id/seekBarOutline"
+        android:layout_width="wrap_content"
+        android:layout_height="300dp"
+        android:layout_centerVertical="true"
+        android:progressDrawable="@drawable/track"/>
+
+    <Button
+        android:visibility="gone"
+        android:id="@+id/buttonColorPickerDialog"
         android:layout_width="match_parent"
-        android:layout_height="60dp"
-        android:background="@drawable/track"
-        android:layout_toRightOf="@id/imageViewSize"
+        android:background="@color/colorAccent"
+        android:text="Select Color"
+        android:textSize="20sp"
+        android:textColor="@color/white"
+        style="?android:attr/borderlessButtonStyle"
         android:layout_alignParentBottom="true"
-        android:progressDrawable="@drawable/track"
-        />
-
-    <SeekBar
-        android:id="@+id/seekBarAlpha"
-        android:layout_width="match_parent"
-        android:layout_height="60dp"
-        android:background="@drawable/track"
-        android:layout_alignWithParentIfMissing="true"
-        android:layout_toRightOf="@id/imageViewTransparency"
-        android:layout_above="@id/seekBarOutline"
-
-        android:progressDrawable="@drawable/track"
-        app:layout_constraintStart_toEndOf="@+id/imageViewTransparency" />
-
+        android:layout_height="wrap_content"/>
     <ImageView
+        android:visibility="gone"
         android:id="@+id/imageViewSize"
         android:layout_width="60dp"
         android:layout_height="60dp"
-
-        android:layout_alignParentBottom="true"
-        android:padding="8dp"
-        android:background="@color/colorAccent" />
-
-    <ImageView
-        android:id="@+id/imageViewTransparency"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
+        android:layout_below="@id/bottomFonts"
         android:padding="8dp"
         android:layout_alignWithParentIfMissing="true"
-        android:background="@color/colorAccent"
-        android:layout_above="@id/imageViewSize" />
+        android:background="@color/background"
+        android:src="@drawable/size" />
+
+
 
 
 </RelativeLayout>

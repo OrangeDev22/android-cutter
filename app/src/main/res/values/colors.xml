@@ -7,5 +7,8 @@
     <color name="colorPrimaryDark">#121212</color>
     <color name="colorPrimary">#1b1d21</color>
     <color name="transparent">#00000000</color>
+    <color name="BLACK">#000000</color>
+    <color name="dark_transparent">#3f000000</color>
+    <color name="rounded_background">#dd000000</color>
 
 </resources>

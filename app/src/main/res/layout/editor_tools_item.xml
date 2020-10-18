@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_margin="@dimen/_10sdp"
+    android:clickable="true"
+    android:focusable="true"
+    android:background="?attr/selectableItemBackground">
+
+
+
+    <ImageView
+        android:id="@+id/imgToolIcon"
+        android:layout_width="@dimen/_28sdp"
+        android:layout_height="@dimen/_28sdp"
+        android:src="@drawable/color_circle"
+        android:layout_centerHorizontal="true" />
+
+    <TextView
+        android:id="@+id/txtTool"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/colorAccent"
+        android:layout_below="@id/imgToolIcon"
+        android:layout_centerHorizontal="true"
+        android:textAlignment="center"
+        android:textSize="8sp"
+        tools:text="BG COLOR" />
+
+
+</RelativeLayout>

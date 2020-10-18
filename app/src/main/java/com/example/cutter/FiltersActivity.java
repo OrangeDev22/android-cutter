@@ -13,12 +13,17 @@ import android.graphics.drawable.BitmapDrawable;
 import android.media.Image;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Display;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TableLayout;
 import android.widget.Toast;
 
@@ -34,7 +39,7 @@ import com.karumi.dexter.MultiplePermissionsReport;
 import com.karumi.dexter.PermissionToken;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
-import com.shashi.mysticker.StickerView;
+
 import com.zomato.photofilters.imageprocessors.Filter;
 import com.zomato.photofilters.imageprocessors.subfilters.BrightnessSubFilter;
 import com.zomato.photofilters.imageprocessors.subfilters.ContrastSubFilter;
@@ -80,6 +85,15 @@ public class FiltersActivity extends AppCompatActivity implements FiltersListFra
         //tabLayout.setSelectedTabIndicatorColor(R.color.white);
         tabLayout.setTabTextColors(Color.parseColor("#FFFFFF"),Color.parseColor("#BB86FC"));
         tabLayout.setupWithViewPager(viewPager);
+        /*WindowManager wm = (WindowManager) getSystemService(WINDOW_SERVICE);
+        Display display = wm.getDefaultDisplay();
+        DisplayMetrics metrics = getResources().getDisplayMetrics();
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        int screen_width = metrics.widthPixels;
+        int screen_height = displayMetrics.heightPixels;
+        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(screen_width,(int)(screen_height*0.5));
+        img_preview.setLayoutParams(layoutParams);*/
         loadImage();
     }
 

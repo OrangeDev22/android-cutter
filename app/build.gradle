@@ -5,11 +5,10 @@ android {
 
     defaultConfig {
         applicationId "com.example.cutter"
-        minSdkVersion 24
+        minSdkVersion 26
         targetSdkVersion 28
         versionCode 1
         versionName "1.0"
-
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -27,12 +26,13 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:2.0.1'
     implementation 'androidx.navigation:navigation-fragment:2.3.0'
     implementation 'androidx.navigation:navigation-ui:2.3.0'
-
     testImplementation 'junit:junit:4.12'
     implementation "com.github.skydoves:powermenu:2.1.4"
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
-    implementation 'androidx.navigation:navigation-fragment:2.1.0'
+    implementation project(':sticker')
+    implementation "com.github.skydoves:colorpickerview:2.2.0"
+    implementation 'androidx.navigation:navigation-fragment:2.3.0'
     implementation 'com.google.android.material:material:1.2.1'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation 'com.android.support:recyclerview-v7:28.0.0'
@@ -40,4 +40,5 @@ dependencies {
     implementation 'com.karumi:dexter:4.1.0'
     implementation 'info.androidhive:imagefilters:1.0.7'
     implementation 'com.github.madrapps:pikolo:2.0.1'
+    implementation 'com.intuit.sdp:sdp-android:1.0.6'
 }

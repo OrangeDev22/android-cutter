@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/colorPrimary">
+    <TextView
+        android:id="@+id/text_view_frame_corners"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/text_view_frame_corner"
+        android:textColor="@color/white"
+        android:layout_marginLeft="@dimen/_7sdp"
+        android:textSize="22sp" />
+    <SeekBar
+        android:id="@+id/seek_bar_frame_corners"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/_2sdp"
+        android:layout_below="@id/text_view_frame_corners"
+        android:progressDrawable="@drawable/track"/>
+    <TextView
+        android:id="@+id/text_view_frame_width"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/text_view_frame_width"
+        android:layout_below="@id/seek_bar_frame_corners"
+        android:textColor="@color/white"
+        android:layout_marginLeft="@dimen/_7sdp"
+        android:textSize="22sp" />
+    <SeekBar
+        android:id="@+id/seek_bar_frame_width"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/text_view_frame_width"
+        android:padding="@dimen/_2sdp"
+        android:progressDrawable="@drawable/track"
+        android:layout_marginBottom="@dimen/_8sdp"
+        />
+</RelativeLayout>

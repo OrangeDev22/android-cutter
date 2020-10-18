@@ -2,6 +2,7 @@ package com.example.cutter;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -15,6 +16,7 @@ import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
+import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -32,13 +34,16 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.ContentView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
@@ -49,6 +54,8 @@ import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 
 import com.example.cutter.adapters.IconMenuAdapter;
+import com.example.cutter.constants.Constants;
+import com.example.cutter.utils.BitmapUtils;
 import com.example.cutter.utils.ImageUtilities;
 import com.example.cutter.views.DrawView;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -71,14 +78,15 @@ public class CropActivity extends AppCompatActivity implements PopupMenu.OnMenuI
     private static final int CAMERA_REQUEST = 1888;
     private boolean cropped= false;
     private ProgressDialog dialog;
-    private boolean trimming = false;
-    private String currentPhotoPath;
+    private boolean trimming = false, activityStarted = false;
+    private String currentPhotoPath,ImagePath;
     private BottomNavigationView bottomNav;
     private CustomPowerMenu customPowerMenu;
     private Toolbar toolbar;
     private ImageUtilities imageUtilities;
     private Drawable drawable;
     int STORAGE_PERMISSION_CODE = 0;
+    private boolean isActive;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -86,21 +94,11 @@ public class CropActivity extends AppCompatActivity implements PopupMenu.OnMenuI
 
        if(RequestPermissionsHelper.verifyPermissions(this)){
            initApp();
-           bitmapToImageView(bmp);
         }
         else{
           requestPermissions();
         }
         Log.e("app status","on create");
-       // im_crop_image.setOnTouchListener(this);
-
-       /* canvas.drawColor(Color.BLACK);
-        canvas.drawBitmap(bmp, cx,cy,null);
-        drawable = new BitmapDrawable(getApplicationContext().getResources(),bmp);
-        im_crop_image.setBackground(drawable);*/
-
-        //im_crop_image.setImageBitmap(alteredBitmap);
-
     }
     private void requestPermissions(){
         if (ActivityCompat.shouldShowRequestPermissionRationale(this,
@@ -126,69 +124,45 @@ public class CropActivity extends AppCompatActivity implements PopupMenu.OnMenuI
                     new String[] {Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE
                             ,Manifest.permission.CAMERA}, STORAGE_PERMISSION_CODE);
         }
-            /*ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE
-            ,Manifest.permission.CAMERA},PERMISION_CODE);*/
-        //RequestPermissionsHelper.requestPermission(this);
-    }
-
-    private boolean checkPermissions(){
-        boolean permission = false;
-        if(ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED){
-            permission = true;
-             if(ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED){
-                 if(ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED){
-
-                 }
-                 else{
-                     permission = false;
-                 }
-             }else{
-                 permission = false;
-             }
-        }
-        else{
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.READ_CONTACTS},
-                    1);
-        }
-        return true;
     }
 
     private void initApp(){
-        init();
-
-        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.KITKAT) {
-            Window window = this.getWindow();
-            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-            window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-            window.setStatusBarColor(this.getResources().getColor(R.color.colorPrimaryDark));
-        }
-
-
+        toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        TextView textView = toolbar.findViewById(R.id.toolbar_title);
+        textView.setText(getString(R.string.tool_bar_crop_title));
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        im_crop_image =  findViewById(R.id.im_crop_image);
+        im_crop_image.setOnImageCroppedListener(this);
+        im_crop_image.setLayerType(View.LAYER_TYPE_SOFTWARE,null);
+        bottomNav = findViewById(R.id.bottomNavigationView);
+        bottomNav.setOnNavigationItemSelectedListener(navListener);
+        bottomNav.setSelectedItemId(R.id.bottomCropSquare);
+        isActive = true;
     }
 
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
        if(hasFocus){
+           if(!activityStarted){
+               DisplayMetrics metrics = getResources().getDisplayMetrics();
+               DisplayMetrics displayMetrics = new DisplayMetrics();
+               getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+               screen_width = metrics.widthPixels;
+               screen_height = displayMetrics.heightPixels - getStatusBarHeight()-bottomNav.getHeight()-toolbar.getHeight();
+               imageUtilities = new ImageUtilities();
+               initCustomMenu();
+               initCanvas();
+               bitmapToImageView(bmp);
+               activityStarted = true;
+               isActive = true;
+           }
+           Log.e("BottomNavBar dims", bottomNav.getHeight()+"");
            //Log.e("toolbard and bottombar dims",bottomNav.getHeight()+"x"+toolbar.getHeight());
         }
     }
-
-    @Override
-    protected void onPostResume() {
-        super.onPostResume();
-        canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
-        Paint paint = new Paint();
-        paint.setFilterBitmap(true);
-        canvas.drawBitmap(bmp,scaleImage(bmp),paint);
-        bitmapToImageView(bmp);
-        im_crop_image.setBitmap(alteredBitmap);
-        cropped = false;
-    }
-
-    private void init(){
-        toolbar = findViewById(R.id.toolbar);
+    private void initCustomMenu(){
         customPowerMenu = new CustomPowerMenu.Builder<>(this, new IconMenuAdapter())
                 .addItem(new IconPowerMenuItem(ContextCompat.getDrawable(this, R.drawable.ic_baseline_image_24),"Image"))
                 .addItem(new IconPowerMenuItem(ContextCompat.getDrawable(this, R.drawable.ic_baseline_camera_alt_24),"Camera"))
@@ -198,26 +172,16 @@ public class CropActivity extends AppCompatActivity implements PopupMenu.OnMenuI
                 .setMenuShadow(10f)
                 .setWidth(screen_width)
                 .build();
-        setSupportActionBar(toolbar);
-        TextView textView = toolbar.findViewById(R.id.toolbar_title);
-        textView.setText("Cropper");
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
-        im_crop_image =  findViewById(R.id.im_crop_image);
-        im_crop_image.setOnImageCroppedListener(this);
-        im_crop_image.setLayerType(View.LAYER_TYPE_SOFTWARE,null);
-        bottomNav = findViewById(R.id.bottomNavigationView);
-        bottomNav.setOnNavigationItemSelectedListener(navListener);
-        bottomNav.setSelectedItemId(R.id.bottomCropSquare);
-        DisplayMetrics metrics = getResources().getDisplayMetrics();
-        DisplayMetrics displayMetrics = new DisplayMetrics();
-        getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
-        screen_width = metrics.widthPixels;
-        screen_height = displayMetrics.heightPixels- getStatusBarHeight();
-
-        imageUtilities = new ImageUtilities();
-
-        initCanvas();
     }
+
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+    }
+
+
     public int getStatusBarHeight() {
         int result = 0;
         int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
@@ -228,22 +192,11 @@ public class CropActivity extends AppCompatActivity implements PopupMenu.OnMenuI
     }
     public void initCanvas(){
         Drawable d = ContextCompat.getDrawable(this, R.drawable.chiki_drawing);
-        Rect dest = new Rect(0, 0, screen_width, screen_height);
-         /*Bitmap background = Bitmap.createScaledBitmap
-                (bmp, screen_width, screen_height, false);*/
-        //bmp = ((BitmapDrawable)d).getBitmap();
-        //bmp = ((BitmapDrawable)d).getBitmap();
-        //bmp = Bitmap.createScaledBitmap(((BitmapDrawable)d).getBitmap(), screen_width,screen_height,false);
-        Bitmap temp = ((BitmapDrawable)d).getBitmap();
         bmp = ((BitmapDrawable)d).getBitmap();
-
         alteredBitmap = Bitmap.createBitmap(screen_width, screen_height,bmp.getConfig());
         canvas = new Canvas(alteredBitmap);
-
         im_crop_image.setBitmap(alteredBitmap);
-
-
-
+        //im_crop_image.setBitmap(bmp);
     }
 
 
@@ -272,6 +225,29 @@ public class CropActivity extends AppCompatActivity implements PopupMenu.OnMenuI
                     im_crop_image.setMode(2);
                     break;
                 case R.id.bottomCropSelectAll:
+                    /*final Dialog dialog = new Dialog(CropActivity.this);
+                    dialog.setContentView(R.layout.select_video_dialog_layout);
+                    Button buttonTimeInterval = dialog.findViewById(R.id.buttonTimeInterval);
+                    Button buttonAtImage = dialog.findViewById(R.id.buttonAtImageType);
+                    final Intent intent = new Intent(CropActivity.this, VideoActivity.class);
+                    buttonTimeInterval.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            intent.putExtra("video_type", Constants.AT_TIME_INTERVAL);
+                            startActivity(intent);
+                            dialog.dismiss();
+                        }
+                    });
+                    buttonAtImage.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            intent.putExtra("video_type",Constants.AT_IMAGE_TIME);
+                            startActivity(intent);
+                            dialog.dismiss();
+                        }
+                    });
+                    dialog.show();*/
+                    ImagePath = ImageUtilities.encodeImage(bmp, Bitmap.CompressFormat.PNG,100);
                     startNewActivity();
                     //im_crop_image.setMode(3);
                     //Toast.makeText(getBaseContext(),"Please click on the area you want to delete",Toast.LENGTH_LONG).show();
@@ -282,12 +258,6 @@ public class CropActivity extends AppCompatActivity implements PopupMenu.OnMenuI
         }
     };
     private void showPopup(View v){
-        /*PopupMenu popupMenu = new PopupMenu(getApplicationContext(), v);
-        popupMenu.setOnMenuItemClickListener(this);
-        popupMenu.inflate(R.menu.popup_select_item_menu);
-        popupMenu.show();*/
-
-
         Log.e("bottom nav height",bottomNav.getHeight()+"x"+customPowerMenu.getContentViewHeight());
         WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
         customPowerMenu.showAsDropDown(bottomNav,
@@ -347,10 +317,7 @@ public class CropActivity extends AppCompatActivity implements PopupMenu.OnMenuI
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
-
         }
-
-
     }
 
     @Override
@@ -389,32 +356,30 @@ public class CropActivity extends AppCompatActivity implements PopupMenu.OnMenuI
 
     @Override
     public void onImageCropped(ByteArrayOutputStream bytes) {
-        Log.e("CROPPING", "in");
+
         Bitmap temp_bitmap = BitmapFactory.decodeByteArray(bytes.toByteArray(),0,bytes.toByteArray().length);
 
         if(temp_bitmap.getWidth() > 0 && temp_bitmap.getHeight() >0){
+            Log.e("CROPPING", "in");
             Bitmap emptyBitmap = Bitmap.createBitmap(temp_bitmap.getWidth(), temp_bitmap.getHeight(),temp_bitmap.getConfig());
             if(!temp_bitmap.sameAs(emptyBitmap)){
                 cropped = true;
-                canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
+                //canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
+                //bitmapToImageView(temp_bitmap);
                 startAsyncTask(temp_bitmap);
             }else{
                 Log.e("Bitmap_Status","Bitmap is empty");
             }
         }
-
-
+        im_crop_image.invalidate();
     }
 
     @Override
     public void onBackPressed() {
         /*if(this.cropped){
             canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
-            int cx = (screen_width - bmp.getWidth()) >> 1;
-            int cy = (screen_height - bmp.getHeight()) >> 1;
             Paint paint = new Paint();
             paint.setFilterBitmap(true);
-            canvas.drawBitmap(bmp,scaleImage(bmp),paint);
             //canvas.drawBitmap(bmp, scaleImage(bmp), paint);
             //im_crop_image.setImageBitmap(alteredBitmap);
             bitmapToImageView(bmp);
@@ -429,8 +394,6 @@ public class CropActivity extends AppCompatActivity implements PopupMenu.OnMenuI
             super.onBackPressed();
         }
     }
-
-
 
     public void startAsyncTask(Bitmap bitmap){
         TrimAsyncTask task = new TrimAsyncTask(this);
@@ -448,13 +411,14 @@ public class CropActivity extends AppCompatActivity implements PopupMenu.OnMenuI
 
     private static class TrimAsyncTask extends AsyncTask<Bitmap, Integer, Bitmap> {
         private WeakReference<CropActivity> activityWeakReference;
+        private CropActivity activity;
         TrimAsyncTask(CropActivity activity){
             activityWeakReference = new WeakReference<>(activity);
+            this.activity = activityWeakReference.get();
         }
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            CropActivity activity = activityWeakReference.get();
             if(activity == null || activity.isFinishing() ){
                 return;
             }
@@ -464,28 +428,21 @@ public class CropActivity extends AppCompatActivity implements PopupMenu.OnMenuI
         @Override
         protected Bitmap doInBackground(Bitmap... bitmaps) {
             Bitmap bitmap = ImageUtilities.trim(bitmaps[0]);
+            activity.ImagePath = ImageUtilities.encodeImage(bitmap, Bitmap.CompressFormat.PNG,100);
+            //activity.im_crop_image.setBackground(new BitmapDrawable(activity.getResources(),bitmap));
             return  bitmap;
         }
 
         @Override
         protected void onPostExecute(Bitmap bitmap) {
-            CropActivity activity = activityWeakReference.get();
             if(activity == null || activity.isFinishing() ){
                 return;
             }
             super.onPostExecute(bitmap);
-            int cx = (activity.screen_width - bitmap.getWidth()) >> 1;
-            int cy = (activity.screen_height - bitmap.getHeight()) >> 1;
-            activity.canvas.drawBitmap(bitmap,cx,cy,null);
-            Rect rect = new Rect(0,0,activity.screen_width,activity.screen_height);
-            Canvas canvas = new Canvas();
-            canvas.drawBitmap(bitmap,rect,rect,null);
-            //Bitmap canvasBitmap = Bitmap.createBitmap(activity.screen_width,activity.screen_height,)
-            Log.e("bitmap dimensions after trimming",bitmap.getWidth()+"x"+bitmap.getHeight());
-            //Drawable drawable = new BitmapDrawable(activity.getResources(),activity.alteredBitmap);
-            //activity.im_crop_image.setBackground(drawable);
-            activity.dialog.dismiss();
             activity.trimming = false;
+            activity.dialog.dismiss();
+            //activity.bitmapToImageView(bitmap);
+            //activity.im_crop_image.setBackground(new BitmapDrawable(activity.getResources(), bitmap));
             activity.startNewActivity();
 
         }
@@ -502,13 +459,6 @@ public class CropActivity extends AppCompatActivity implements PopupMenu.OnMenuI
         //FileUtils.initializeDirectories(this);
         if(RequestPermissionsHelper.verifyPermissions(this)){
             initApp();
-            int cx = (screen_width - bmp.getWidth())/2;
-            int cy = (screen_height - bmp.getHeight())/2;
-            Log.e("cx and cy", cx+"x"+cy);
-            Rect dest = new Rect(0, 0, screen_width, screen_height);
-            Paint paint =new Paint();
-            paint.setFilterBitmap(true);
-            bitmapToImageView(bmp);
             //overridePendingTransition(0, 0);
         }
         else{
@@ -523,6 +473,7 @@ public class CropActivity extends AppCompatActivity implements PopupMenu.OnMenuI
         Bitmap bitmap;
         if(requestCode == PICK_IMAGE && resultCode == Activity.RESULT_OK){
             try {
+                canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
                 Uri imageData = data.getData();
                 bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imageData);
                 bitmapToImageView(bitmap);
@@ -530,6 +481,7 @@ public class CropActivity extends AppCompatActivity implements PopupMenu.OnMenuI
                 e.printStackTrace();
             }
         }else if(requestCode == CAMERA_REQUEST && resultCode == Activity.RESULT_OK){
+            canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
             bitmap =  BitmapFactory.decodeFile(currentPhotoPath);
             bitmapToImageView(bitmap);
         }
@@ -537,23 +489,38 @@ public class CropActivity extends AppCompatActivity implements PopupMenu.OnMenuI
     private void bitmapToImageView(Bitmap bitmap){
         int inWidth = bitmap.getWidth();
         int inHeight = bitmap.getHeight();
-
-        bitmap = Bitmap.createBitmap(bitmap,0,0,bitmap.getWidth(),bitmap.getHeight(),scaleImage(bitmap),true);
-        bmp = bitmap;
+        //bitmap = Bitmap.createBitmap(bitmap,0,0,bitmap.getWidth(),bitmap.getHeight(),scaleImage(bitmap),true);
+        //bitmap = Bitmap.createScaledBitmap(bitmap)
+        bmp = Bitmap.createBitmap(bitmap,0,0,bitmap.getWidth(),bitmap.getHeight(),scaleImage(bitmap),true);
+        //bmp = bitmap.copy(Bitmap.Config.ARGB_8888,true);
+        //im_crop_image.setBitmap(alteredBitmap);
         Log.e("Bitmap original Dimensions",inWidth +"X"+inHeight);
-        Log.e("Bitmap new Dimensions",bitmap.getWidth() +"X"+bitmap.getHeight());
         Paint paint = new Paint();
         paint.setFilterBitmap(true);
         canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
-        Rect dest = new Rect(0, 0, screen_width, bitmap.getHeight());
         int cx = (screen_width- bmp.getWidth()) >> 1;
         int cy = (screen_height - bmp.getHeight()) >> 1;
-        Matrix transformation = scaleImage(bmp);
-        canvas.drawBitmap(bmp, cx,cy, paint);
-        drawable = new BitmapDrawable(getResources(),alteredBitmap);
-        //im_crop_image.setImageBitmap(alteredBitmap);
-        Log.e("Imageview and bitmap heig", screen_width+"x"+screen_height);
-        im_crop_image.setBackground(drawable);
+        if(bmp.getHeight()>screen_height){
+            //Bitmap out = Bitmap.createScaledBitmap(bmp,screen_width,screen_height,false);
+            Bitmap out = BitmapUtils.scaleBitmap(bmp,screen_width,screen_height);
+            //Bitmap out = Bitmap.createScaledBitmap(bmp,screen_width,screen_height,true);
+            Log.e("bitmaps_heights",out.getWidth()+"x"+bmp.getHeight()+"x"+canvas.getHeight()+"x"+screen_height);
+            /*Rect dstRect = new Rect();
+            canvas.getClipBounds(dstRect);
+            canvas.drawBitmap(out, null, dstRect, null);*/
+            //canvas.drawBitmap(bmp, new Rect(0,0,bmp.getWidth(), bmp.getHeight()), dstRect, null);
+            canvas.drawBitmap(out, (screen_width- out.getWidth()) >> 1 ,(screen_height - out.getHeight()) >> 1, paint);
+            im_crop_image.setBackground(new BitmapDrawable(getResources(),alteredBitmap));
+            //canvas.drawBitmap(out, null, new RectF(0, 0, screen_width, screen_height), null);
+        }
+        else{
+            canvas.drawBitmap(bmp, cx,cy, paint);
+            drawable = new BitmapDrawable(getResources(),alteredBitmap);
+            im_crop_image.setBackground(drawable);
+        }
+        //canvas.drawBitmap(dstBmp, cx,cy, paint);
+
+
     }
 
     private Matrix scaleImage(Bitmap bitmap){
@@ -568,10 +535,10 @@ public class CropActivity extends AppCompatActivity implements PopupMenu.OnMenuI
         return transformation;
     }
     private void startNewActivity(){
-        String ImagePath = ImageUtilities.encodeImage(alteredBitmap, Bitmap.CompressFormat.PNG,100);
-        Intent intent = new Intent(CropActivity.this, FiltersActivity.class);
+        Intent intent = new Intent(CropActivity.this, EditActivity.class);
+        //intent.putExtra("bitmap_CropActivity",ImagePath);
         intent.putExtra("bitmap_CropActivity",ImagePath);
+        isActive = false;
         startActivity(intent);
     }
 }
-

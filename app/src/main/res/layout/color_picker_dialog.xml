@@ -2,6 +2,12 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent" android:layout_height="match_parent"
     >
+    <ImageView
+        android:id="@+id/image_view_close_color_picker"
+        android:layout_margin="5dp"
+        android:src="@drawable/ic_baseline_close_24"
+        android:layout_width="40dp"
+        android:layout_height="40dp"/>
     <com.madrapps.pikolo.HSLColorPicker
         android:id="@+id/colorPicker"
         android:layout_width="match_parent"
