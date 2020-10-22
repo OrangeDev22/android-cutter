@@ -6,14 +6,15 @@
     android:layout_height="match_parent"
     android:background="@color/background"
     tools:context=".EditActivity">
-
-    <LinearLayout
+    <include layout="@layout/toolbar"
+        android:id="@+id/toolbar_edit_activity"/>
+   <!--<LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_centerInParent="true"
-        android:layout_above="@id/bottomMenuRecyclerView"
+
      >
-        <LinearLayout
+        <RelativeLayout
             android:id="@+id/workArea"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -21,19 +22,32 @@
             android:gravity="center"
 
             >
-            <com.xiaopo.flying.sticker.StickerView
-                android:id="@+id/sticker_view"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@drawable/paint_can"
-                app:showBorder="true"
-                app:showIcons="true">
-
-            </com.xiaopo.flying.sticker.StickerView>
 
 
-        </LinearLayout>
-    </LinearLayout>
+
+
+        </RelativeLayout>
+    </LinearLayout>-->
+
+    <com.xiaopo.flying.sticker.StickerView
+        android:id="@+id/sticker_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:background="@android:color/transparent"
+        app:showBorder="true"
+        app:showIcons="true">
+
+        <ImageView
+            android:id="@+id/image_view_background"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:adjustViewBounds="true"
+            android:layout_centerInParent="true"
+            android:scaleType="centerCrop"/>
+    </com.xiaopo.flying.sticker.StickerView>
+
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/bottomMenuRecyclerView"
         android:layout_width="match_parent"

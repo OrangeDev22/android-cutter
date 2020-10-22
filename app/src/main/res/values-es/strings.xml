@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Cutter</string>
+    <string name="text_view_gallery">Abrir galeria</string>
+    <string name="text_view_take_picture">Usar camara</string>
+    <string name="positive_button_filter">Aceptar</string>
+    <string name="negative_button_filter">Cancelar</string>
+    <string name="toolbar_edit_activity_title">Edicitor</string>
+    <string name="edit_bottom_menu_frame_color">Color Borde</string>
+    <string name="edit_bottom_menu_sticker">Pegatinas</string>
+    <string name="edit_bottom_menu_Text">Texto</string>
+    <string name="edit_bottom_menu_add_frame">Marco</string>
+    <string name="edit_bottom_menu_add_filter">Filtros</string>
+    <string name="edit_bottom_menu_add_brightness">Brillo</string>
+    <string name="edit_bottom_menu_add_contrast">Contraste</string>
+    <string name="edit_bottom_menu_add_saturation">Saturación</string>
+    <string name="edit_progress_dialog_message">Guardando imagen porfavor espere...</string>
+    <string name="edit_image_saved_message">Imagen guardada en: </string>
+    <string name="text_view_frame_corner">Esquinas</string>
+    <string name="text_view_frame_width">Hancho</string>
+    <string name="tool_bar_crop_title">Cortador</string>
+    <string name="bottom_crop__menu_square">Cuadrado</string>
+    <string name="bottom_crop_menu_oval">Circulo</string>
+    <string name="bottom_crop_menu_free">Libre</string>
+    <string name="bottom_crop_menu_select_all">Todo</string>
+    <string name="bottom_crop_menu_delete_background">Eliminar Fondo</string>
+    <string name="crop_activity_progress_dialog_message">Cargando porfavor espere...</string>
+    <string name="bottom_crop_menu_ratio">relación de aspecto</string>
+    <string name="bottom_crop_aspect_ratio_all">Todo</string>
+</resources>

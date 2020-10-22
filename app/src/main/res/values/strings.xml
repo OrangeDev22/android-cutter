@@ -2,4 +2,36 @@
     <string name="app_name">Cutter</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <!--            MainActivity                -->
+    <string name="text_view_gallery">Open Gallery</string>
+    <string name="text_view_take_picture">Use Camera</string>
+    <!--            dialogsButtons              -->
+    <string name="positive_button_filter">Confirm</string>
+    <string name="negative_button_filter">Cancel</string>
+
+    <!--                EditActivity           -->
+    <string name="toolbar_edit_activity_title">Editor</string>
+    <string name="edit_bottom_menu_frame_color">Frame Color</string>
+    <string name="edit_bottom_menu_sticker">Add Sticker</string>
+    <string name="edit_bottom_menu_Text">Add Text</string>
+    <string name="edit_bottom_menu_add_frame">Add Frame</string>
+    <string name="edit_bottom_menu_add_filter">Filters</string>
+    <string name="edit_bottom_menu_add_brightness">Brightness</string>
+    <string name="edit_bottom_menu_add_contrast">Contrast</string>
+    <string name="edit_bottom_menu_add_saturation">Saturation</string>
+    <string name="edit_progress_dialog_message">Saving image please wait...</string>
+    <string name="edit_image_saved_message">Image Saved at: </string>
+    <!--                AddFrameDialog                  -->
+    <string name="text_view_frame_corner">Corners</string>
+    <string name="text_view_frame_width">Width</string>
+    <!--                CropActivity                    -->
+    <string name="tool_bar_crop_title">Cropper</string>
+    <string name="bottom_crop__menu_square">Square</string>
+    <string name="bottom_crop_menu_oval">Oval</string>
+    <string name="bottom_crop_menu_free">Free Style</string>
+    <string name="bottom_crop_menu_select_all">Select All</string>
+    <string name="bottom_crop_menu_delete_background">Remove Background</string>
+    <string name="crop_activity_progress_dialog_message">Loading please wait...</string>
+    <string name="bottom_crop_menu_ratio">Aspect Ratio</string>
+    <string name="bottom_crop_aspect_ratio_all">All</string>
 </resources>

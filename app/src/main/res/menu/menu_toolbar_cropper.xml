@@ -20,5 +20,10 @@
         android:iconTint="@color/colorAccent"
         android:title="backup"
         app:showAsAction="always" />
+    <item
+        android:id="@+id/action_crop"
+        android:icon="@drawable/ic_baseline_check_24"
+        android:title="backup"
+        app:showAsAction="always" />
 
 </menu>

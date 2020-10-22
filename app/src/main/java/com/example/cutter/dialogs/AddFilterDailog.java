@@ -51,6 +51,9 @@ public class AddFilterDailog extends DialogFragment implements ThumbnailAdapter.
     private boolean apply = false;
     public Bitmap bitmap;
     Filter filterSelected;
+    public AddFilterDailog(List<ThumbnailItem> list){
+        this.list = list;
+    }
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
 
@@ -71,8 +74,10 @@ public class AddFilterDailog extends DialogFragment implements ThumbnailAdapter.
         LayoutInflater inflater = getActivity().getLayoutInflater();
         View view = inflater.inflate(R.layout.add_filter_dialog,null);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext(),RecyclerView.HORIZONTAL,false);
-        list = new ArrayList<>();
-        displayThumbnail(bitmap);
+        //list = new ArrayList<>();
+        filterSelected = list.get(0).filter;
+        adapter = new ThumbnailAdapter(list,this, getContext());
+        //displayThumbnail(bitmap);
         Log.e("adapter_size",adapter.getItemCount()+"");
         positiveButton = view.findViewById(R.id.dialog_filter_positive_button);
         negativeButton = view.findViewById(R.id.dialog_filter_negative_button);
@@ -131,6 +136,7 @@ public class AddFilterDailog extends DialogFragment implements ThumbnailAdapter.
         adapter.setSelectedFilter(position);
         filterSelected = filter;
         listener.onFilterSelected(filter);
+        //dialogListener.FilterSelected(position);
     }
     public void setBitmap(Bitmap bitmap){
         this.bitmap = bitmap;
@@ -163,7 +169,6 @@ public class AddFilterDailog extends DialogFragment implements ThumbnailAdapter.
         ThumbnailsManager.addThumb(thumbnailItem);
         List<Filter> filters = FilterPack.getFilterPack(getContext());
         for(Filter filter:filters){
-            Log.e("puta","la que te pario"+filters.size());
             ThumbnailItem tI = new ThumbnailItem();
             tI.image = thumbImg;
             tI.filter = filter;
@@ -185,6 +190,7 @@ public class AddFilterDailog extends DialogFragment implements ThumbnailAdapter.
     }
     public interface onDialogFilterListener{
         void setFilter(Filter filter,boolean apply);
+        void FilterSelected(int position);
     }
 
     @Override

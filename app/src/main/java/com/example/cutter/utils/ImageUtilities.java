@@ -15,6 +15,8 @@ import android.util.Log;
 import android.util.TypedValue;
 import android.widget.Toast;
 
+import com.example.cutter.constants.Constants;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -151,36 +153,36 @@ public class ImageUtilities {
         Bitmap bitmap = BitmapFactory.decodeFile(input);
         return bitmap;
     }
-    public static void saveAsFile(String format,Bitmap bitmap,Context context) {
-        String root = Environment.getExternalStorageDirectory().toString();
-        File myDir = new File(root, "/noPornPictures");
-        myDir.mkdirs();
+    public static void saveAsFile(Bitmap.CompressFormat compressFormat, Bitmap image, int quality,Context context) {
         Random generator = new Random();
         int n = 10000;
         n = generator.nextInt(n);
-        String fname = File.separator + "Image-" + n + format;
-        File file = new File(myDir + "" + fname);
-        Log.i("TAG", "" + file);
-        if (file.exists())
-            file.delete();
+        String directory = Constants.savedImagesPath;
+        File f3=new File(directory);
+        if(!f3.exists())
+            f3.mkdirs();
+        OutputStream outStream = null;
+        File file = new File(Constants.savedImagesPath+"/"+n+".png");
+        String imageTempPath = "";
         try {
-            file.createNewFile();
-            FileOutputStream out = new FileOutputStream(file);
-            bitmap.compress(Bitmap.CompressFormat.PNG, 85, out);
-            out.flush();
-            out.close();
-            MediaScannerConnection.scanFile(context,
-                    new String[]{file.toString()}, null,
-                    new MediaScannerConnection.OnScanCompletedListener() {
+            outStream = new FileOutputStream(file);
+            image.compress(compressFormat, quality, outStream);
+            outStream.close();
+            imageTempPath = file.getPath();
+            Log.e("temp file","Image Saved");
 
-                        @Override
-                        public void onScanCompleted(String path, Uri uri) {
-
-                        }
-                    });
-
+            //Toast.makeText(, "", Toast.LENGTH_SHORT).show();.makeText(getApplicationContext(), "Saved", Toast.LENGTH_LONG).show();
         } catch (Exception e) {
             e.printStackTrace();
         }
+        MediaScannerConnection.scanFile(context,
+                new String[]{file.toString()}, null,
+                new MediaScannerConnection.OnScanCompletedListener() {
+
+                    @Override
+                    public void onScanCompleted(String path, Uri uri) {
+
+                    }
+                });
     }
 }

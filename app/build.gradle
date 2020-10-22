@@ -41,4 +41,6 @@ dependencies {
     implementation 'info.androidhive:imagefilters:1.0.7'
     implementation 'com.github.madrapps:pikolo:2.0.1'
     implementation 'com.intuit.sdp:sdp-android:1.0.6'
+    api 'com.theartofdev.edmodo:android-image-cropper:2.8.+'
+    implementation 'com.yovenny.StickView:sticklib:1.0.0'
 }

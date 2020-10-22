@@ -261,7 +261,7 @@ public class VideoActivity extends AppCompatActivity implements FramesPreviewAda
         protected Boolean doInBackground(List<Bitmap>... lists) {
             List<Bitmap> previews = lists[0];
             for(Bitmap bitmapDrawable : previews){
-                ImageUtilities.saveAsFile(".png",bitmapDrawable,videoActivity.getApplicationContext());
+               // ImageUtilities.saveAsFile(".png",bitmapDrawable,videoActivity.getApplicationContext());
                 imagesSaved++;
                 publishProgress();
             }
@@ -302,7 +302,7 @@ public class VideoActivity extends AppCompatActivity implements FramesPreviewAda
                 }else{
                     bitmap = activity.createVideoThumbnail(activity.getApplicationContext(),activity.path,duration);
                 }
-                ImageUtilities.saveAsFile(".png",bitmap,activity.getApplicationContext());
+                //ImageUtilities.saveAsFile(".png",bitmap,activity.getApplicationContext());
                 position += seconds;
                 publishProgress();
                 imagesSaved++;

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+
+    <item
+        android:id="@+id/bottomCropSquare"
+        android:title="@string/bottom_crop__menu_square"
+        android:enabled="true"
+        android:icon="@drawable/crop"/>
+    <item
+        android:id="@+id/bottomCropOval"
+        android:title="@string/bottom_crop_menu_oval"
+        android:enabled="true"
+        android:icon="@drawable/circle"/>
+    <item
+        android:id="@+id/bottomAspectRatio"
+        android:title="@string/bottom_crop_menu_ratio"
+        android:enabled="true"
+        android:icon="@drawable/ratio"/>
+
+
+</menu>

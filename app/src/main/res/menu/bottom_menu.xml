@@ -1,12 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <item
-        android:id="@+id/bottomCropImage"
-        android:title="Image"
-        android:icon="@drawable/ic_baseline_image_24"
-        android:enabled="true"
-        />
+
     <item
         android:id="@+id/bottomCropSquare"
         android:title="@string/bottom_crop__menu_square"
@@ -27,5 +22,10 @@
         android:title="@string/bottom_crop_menu_select_all"
         android:enabled="true"
         android:icon="@drawable/ic_baseline_border_outer"/>
-
+    <!--<item
+        android:id="@+id/bottomCropDeleteBackground"
+        android:title="@string/bottom_crop_menu_delete_background"
+        android:icon="@drawable/magic_wand"
+        android:enabled="true"
+        />-->
 </menu>

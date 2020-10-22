@@ -281,7 +281,7 @@ public class AddTextDialog extends DialogFragment implements FontsAdapter.OnItem
     private void fillFontList(){
         fontsList.add(getResources().getFont(R.font.aligator));
         fontsList.add(getResources().getFont(R.font.all_the_roll_personal_use));
-        fontsList.add(getResources().getFont(R.font.antonellie_callygraphy_demo));
+        //fontsList.add(getResources().getFont(R.font.antonellie_callygraphy_demo));
         fontsList.add(getResources().getFont(R.font.autography));
         fontsList.add(getResources().getFont(R.font.bastball));
         fontsList.add(getResources().getFont(R.font.batmfa));

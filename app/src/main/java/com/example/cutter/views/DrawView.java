@@ -269,8 +269,9 @@ public class DrawView extends androidx.appcompat.widget.AppCompatImageView {
         int color = 0xff424242;
         Paint paint = new Paint();
         paint.setAntiAlias(true);
-        canvas.drawARGB(0,0,0,0);
         paint.setColor(color);
+        canvas.drawARGB(0,0,0,0);
+
 
         //Rect rectangle = new Rect(0,0,,cy);
 

@@ -10,5 +10,6 @@
     <color name="BLACK">#000000</color>
     <color name="dark_transparent">#3f000000</color>
     <color name="rounded_background">#dd000000</color>
+    <color name="colorPrimarySecondary">#3f4246</color>
 
 </resources>
