@@ -19,14 +19,14 @@
         android:layout_height="40dp"
         android:layout_marginLeft="5dp"
         android:src="@drawable/ic_baseline_close_24"
-        android:layout_marginTop="22dp"/>
+        android:layout_marginTop="5dp"/>
     <include
         android:id="@+id/topFragmentOptions"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         layout="@layout/top_fragment_options"
-        android:layout_marginTop="22dp"/>
+        android:layout_marginTop="5dp"/>
     <ImageView
         android:id="@+id/imageViewDone"
         android:layout_width="40dp"
@@ -34,48 +34,17 @@
         android:src="@drawable/ic_baseline_check_24"
         android:layout_alignParentEnd="true"
         android:layout_marginRight="5dp"
-        android:layout_marginTop="22dp"/>
-    <!--<androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/bottomMenu"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:background="@color/transparent"
-        android:orientation="horizontal"
-        android:clickable="true"
-        android:focusable="true"
-        tools:listitem="@layout/text_tools_layout"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
--->
-    <!--<LinearLayout
-        android:id="@+id/linearLayout"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/editTextInput"
-        android:layout_marginTop="88dp"
-        android:layout_centerHorizontal="true"
-        android:gravity="center"
-
-        >
-        <com.example.cutter.views.CustomTextViewOutline
-            android:id="@+id/add_text_edit_text2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="4dp"
-            android:textAlignment="center"
-            android:text="Text Example"
-            android:textSize="40sp"
-            />
-    </LinearLayout>-->
+        android:layout_marginTop="5dp"/>
 
     <com.example.cutter.views.CustomTextViewOutline
         android:id="@+id/add_text_edit_text2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
-        android:text="Text Example"
+        android:hint="@string/edit_text_hint"
         android:textAlignment="center"
         android:textColor="@color/black"
+        android:textColorHint="@color/white"
         android:background="@color/transparent"
         android:textSize="40sp"
         />

@@ -31,7 +31,7 @@ public class CropToolsAdapter extends RecyclerView.Adapter<CropToolsAdapter.View
         toolList.add(new CropToolsAdapter.ToolModel(5+":"+4, ToolType.FIVEBYFOUR));
         toolList.add(new CropToolsAdapter.ToolModel(16+":"+9, ToolType.SIXTEENBYNINE));
         toolList.add(new CropToolsAdapter.ToolModel(9+":"+16, ToolType.NINEBYSIXTEEN));
-        toolList.add(new CropToolsAdapter.ToolModel(9+":"+16, ToolType.NINEBYSIXTEEN));
+
     }
 
     @NonNull

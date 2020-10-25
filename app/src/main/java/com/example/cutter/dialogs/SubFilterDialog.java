@@ -37,6 +37,9 @@ public class SubFilterDialog extends DialogFragment {
     private int brightness=0;
     private float contrast = 1.0f, saturation = 1.0f;
     private boolean apply=false;
+    public SubFilterDialog(onSubFilterListener listener){
+        this.listener = listener;
+    }
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -135,7 +138,7 @@ public class SubFilterDialog extends DialogFragment {
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
         try {
-            listener = (onSubFilterListener) context;
+            //listener = (onSubFilterListener) context;
         } catch (ClassCastException e) {
             throw new ClassCastException(context.toString() +
                     "must implement onSubFilterListener");

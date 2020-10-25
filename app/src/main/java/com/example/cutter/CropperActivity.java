@@ -12,8 +12,10 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
 import android.graphics.Rect;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -26,8 +28,16 @@ import com.example.cutter.adapters.EditToolsAdapter;
 import com.example.cutter.constants.Constants;
 import com.example.cutter.tools.ToolType;
 import com.example.cutter.utils.ImageUtilities;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.InterstitialAd;
+import com.google.android.gms.ads.MobileAds;
+import com.google.android.gms.ads.initialization.InitializationStatus;
+import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
+
+import java.io.IOException;
 
 public class CropperActivity extends AppCompatActivity implements CropToolsAdapter.onToolListener {
     private Bitmap bitmap;
@@ -44,6 +54,7 @@ public class CropperActivity extends AppCompatActivity implements CropToolsAdapt
     private Boolean changeRect = true;
     private CropImageTask task;
     private Dialog dialog;
+    private InterstitialAd interstitialAd;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,6 +63,16 @@ public class CropperActivity extends AppCompatActivity implements CropToolsAdapt
         cropImageView = findViewById(R.id.cropImageView);
         toolbar = findViewById(R.id.toolbar_cropper);;
         recyclerView = findViewById(R.id.bottomMenuRecyclerViewCropper);
+        MobileAds.initialize(this, new OnInitializationCompleteListener() {
+            @Override
+            public void onInitializationComplete(InitializationStatus initializationStatus) {
+            }
+        });
+
+        interstitialAd = new InterstitialAd(this);
+        interstitialAd.setAdUnitId("ca-app-pub-3940256099942544/1033173712");
+        interstitialAd.loadAd(new AdRequest.Builder().build());
+
         CropToolsAdapter adapter = new CropToolsAdapter(this, CropperActivity.this);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL,false);
         recyclerView.setLayoutManager(layoutManager);
@@ -64,25 +85,35 @@ public class CropperActivity extends AppCompatActivity implements CropToolsAdapt
         final TextView textView = toolbar.findViewById(R.id.toolbar_title);
         textView.setText(getString(R.string.tool_bar_crop_title));
         getSupportActionBar().setDisplayShowTitleEnabled(false);
-        String imagePath = getIntent().getExtras().getString(Constants.INTENT_EXTRA_MAIN_ACTIVITY);
-        bitmap = ImageUtilities.decodeImage(imagePath);
-        cropImageView.setImageBitmap(bitmap);
+        //String imagePath = getIntent().getExtras().getString(Constants.INTENT_EXTRA_MAIN_ACTIVITY);
+        Uri uri = Uri.parse(getIntent().getExtras().getString(Constants.INTENT_EXTRA_MAIN_ACTIVITY));
+        //bitmap = ImageUtilities.decodeImage(imagePath);
+        //cropImageView.setImageBitmap(bitmap);
+        cropImageView.setImageUriAsync(uri);
+        try {
+            bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), uri);
+        } catch (IOException e) {
 
+        }
         cropImageView.setOnCropImageCompleteListener(new CropImageView.OnCropImageCompleteListener() {
             @Override
             public void onCropImageComplete(CropImageView view, CropImageView.CropResult result) {
 
             }
         });
-        rect = new Rect(0, 0, bitmap.getWidth(), bitmap.getHeight());
         cropImageView.getCroppedImageAsync();
         cropImageView.setGuidelines(CropImageView.Guidelines.ON);
         cropImageView.setCropShape(CropImageView.CropShape.RECTANGLE);
         cropImageView.setScaleType(CropImageView.ScaleType.FIT_CENTER);
         cropImageView.setAutoZoomEnabled(true);
         cropImageView.setShowProgressBar(true);
-        cropImageView.setCropRect(rect);
 
+    }
+
+    @Override
+    protected void onResume() {
+        //interstitialAd.show();
+        super.onResume();
     }
 
     @Override
@@ -133,6 +164,9 @@ public class CropperActivity extends AppCompatActivity implements CropToolsAdapt
                 return true;
             case R.id.action_crop:
                 Bitmap croppedBitmap = cropImageView.getCroppedImage();
+                if(cropImageView.getCropShape() == CropImageView.CropShape.OVAL){
+                    croppedBitmap = CropImage.toOvalBitmap(croppedBitmap);
+                }
                 StartAsyncTaskCropImage(croppedBitmap);
                 return true;
             default:
@@ -195,7 +229,7 @@ public class CropperActivity extends AppCompatActivity implements CropToolsAdapt
 
         @Override
         protected Void doInBackground(Bitmap... bitmaps) {
-            activity.ImagePath = ImageUtilities.encodeImage(bitmaps[0], Bitmap.CompressFormat.PNG,100);
+            activity.ImagePath = ImageUtilities.encodeImage(bitmaps[0], Bitmap.CompressFormat.PNG,100,activity.getApplicationContext());
             return null;
         }
         @Override

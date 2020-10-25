@@ -189,8 +189,8 @@ public class FiltersActivity extends AppCompatActivity implements FiltersListFra
         if(id == R.id.action_save){
             Intent intent = new Intent(FiltersActivity.this,EditActivity.class);
             finalBitmap = ImageUtilities.trim(filteredBitmap);
-            String ImagePath = ImageUtilities.encodeImage(finalBitmap, Bitmap.CompressFormat.PNG,100);
-            intent.putExtra("bitmap_FilterActivity",ImagePath);
+            //String ImagePath = ImageUtilities.encodeImage(finalBitmap, Bitmap.CompressFormat.PNG,100);
+            //intent.putExtra("bitmap_FilterActivity",ImagePath);
             startActivity(intent);
             //saveImageToGallery();
             //ImageUtilities.saveAsFile(".png",filteredBitmap,FiltersActivity.this);

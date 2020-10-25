@@ -28,8 +28,13 @@ import com.madrapps.pikolo.listeners.SimpleColorSelectionListener;
 public class FrameDialog extends DialogFragment {
     //private ImageView selectFrameColor;
     private SeekBar seekBarFrameWidth,seekBarFrameCorners;
-    private onFrameWidthListener listener;
+    public onFrameWidthListener listener;
     private int selectedColor,frameWidth=0,dpCorners=0;
+    private boolean isShowing = false;
+    public FrameDialog(onFrameWidthListener listener){
+        this.listener = listener;
+        isShowing = true;
+    }
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -109,7 +114,7 @@ public class FrameDialog extends DialogFragment {
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
         try {
-            listener = (onFrameWidthListener) context;
+            //listener = (onFrameWidthListener) context;
         } catch (ClassCastException e) {
             throw new ClassCastException(context.toString() +
                     "must implement onFrameWidthListener");
@@ -145,6 +150,17 @@ public class FrameDialog extends DialogFragment {
         });
         dialog.show();
         dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+    }
+    public boolean isShowing(){
+        return isShowing;
+    }
+    public onFrameWidthListener getListener(){
+        return listener;
+    }
+    @Override
+    public void onDestroyView() {
+        isShowing = false;
+        super.onDestroyView();
     }
 
     @Override

@@ -5,6 +5,7 @@
     <!--            MainActivity                -->
     <string name="text_view_gallery">Open Gallery</string>
     <string name="text_view_take_picture">Use Camera</string>
+    <string name="null_image_message">Invalid file. Please select a valid image</string>
     <!--            dialogsButtons              -->
     <string name="positive_button_filter">Confirm</string>
     <string name="negative_button_filter">Cancel</string>
@@ -21,6 +22,7 @@
     <string name="edit_bottom_menu_add_saturation">Saturation</string>
     <string name="edit_progress_dialog_message">Saving image please wait...</string>
     <string name="edit_image_saved_message">Image Saved at: </string>
+    <string name="edit_text_hint">Text Example</string>
     <!--                AddFrameDialog                  -->
     <string name="text_view_frame_corner">Corners</string>
     <string name="text_view_frame_width">Width</string>
@@ -29,7 +31,7 @@
     <string name="bottom_crop__menu_square">Square</string>
     <string name="bottom_crop_menu_oval">Oval</string>
     <string name="bottom_crop_menu_free">Free Style</string>
-    <string name="bottom_crop_menu_select_all">Select All</string>
+    <string name="bottom_crop_menu_select_all">Free</string>
     <string name="bottom_crop_menu_delete_background">Remove Background</string>
     <string name="crop_activity_progress_dialog_message">Loading please wait...</string>
     <string name="bottom_crop_menu_ratio">Aspect Ratio</string>

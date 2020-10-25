@@ -6,7 +6,7 @@
         android:id="@+id/bottomCropSquare"
         android:title="@string/bottom_crop__menu_square"
         android:enabled="true"
-        android:icon="@drawable/crop"/>
+        android:icon="@drawable/ic_baseline_crop_square_24"/>
     <item
         android:id="@+id/bottomCropOval"
         android:title="@string/bottom_crop_menu_oval"

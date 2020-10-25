@@ -27,6 +27,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.media.Image;
 import android.net.Uri;
+import android.nfc.Tag;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
@@ -61,6 +62,11 @@ import com.example.cutter.tools.ToolType;
 import com.example.cutter.utils.BitmapUtils;
 import com.example.cutter.utils.ImageUtilities;
 import com.example.cutter.views.CustomTextViewOutline;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.InterstitialAd;
+import com.google.android.gms.ads.MobileAds;
+import com.google.android.gms.ads.initialization.InitializationStatus;
+import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.madrapps.pikolo.ColorPicker;
 import com.madrapps.pikolo.listeners.SimpleColorSelectionListener;
@@ -90,9 +96,9 @@ import java.util.Arrays;
 import java.util.List;
 
 
-public class EditActivity extends AppCompatActivity implements FrameDialog.onFrameWidthListener, AddTextDialog.TextEditor,
+public class EditActivity extends AppCompatActivity implements  AddTextDialog.TextEditor,
         AddStickerDialog.onStickerListener, EditToolsAdapter.onToolListener,
-        FiltersListFragmentListener, AddFilterDailog.onDialogFilterListener, SubFilterDialog.onSubFilterListener {
+        FiltersListFragmentListener, AddFilterDailog.onDialogFilterListener {
     private Bitmap originalBitmap,outPutBitmap,tempBitmap;
     private StickerView stickerView;
     private Toolbar toolbar;
@@ -106,8 +112,13 @@ public class EditActivity extends AppCompatActivity implements FrameDialog.onFra
     private ProgressDialog dialog;
     //private StickerSeriesView stickerSeriesView;
     private ImageView backgroundImage;
-    private boolean hasStarted = false;
+    private boolean hasStarted = false,frameDialogIsOpen,drawFrame=false;
+    private FrameDimsRunnable frameRunnable;
+    private Handler frameHandler;
+    private SubFilterRunnable subFilterRunnable;
+    private Handler subFilgerHandler;
     private int originalWidth, originalHeight;
+    private InterstitialAd mInterstitialAd;
     float dif;
     static{
         System.loadLibrary("NativeImageProcessor");
@@ -116,6 +127,16 @@ public class EditActivity extends AppCompatActivity implements FrameDialog.onFra
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit);
+
+        MobileAds.initialize(this, new OnInitializationCompleteListener() {
+            @Override
+            public void onInitializationComplete(InitializationStatus initializationStatus) {
+            }
+        });
+        AdRequest adRequest = new AdRequest.Builder().build();
+        mInterstitialAd = new InterstitialAd(this);
+        mInterstitialAd.setAdUnitId("ca-app-pub-3940256099942544/1033173712");
+        mInterstitialAd.loadAd(new AdRequest.Builder().build());
         toolbar = findViewById(R.id.toolbar_edit_activity);
         setSupportActionBar(toolbar);
         TextView toolBarTittle = toolbar.findViewById(R.id.toolbar_title);
@@ -200,10 +221,11 @@ public class EditActivity extends AppCompatActivity implements FrameDialog.onFra
                 //backgroundImage.setBackground(new ColorDrawable(0x00000000));
                 //stickerView.setBackground(new BitmapDrawable(getResources(),tempBitmap));
                 Log.e("imageview_background",backgroundImage.getWidth()+"X"+backgroundImage.getHeight());*/
-                //tempBitmap = Bitmap.createBitmap(outPutBitmap,0,0,outPutBitmap.getWidth(), outPutBitmap.getHeight(),scaleImage(outPutBitmap),true);
+
                 originalWidth = originalBitmap.getWidth();
                 originalHeight = originalBitmap.getHeight();
-                tempBitmap = BitmapUtils.BITMAP_RESIZER(outPutBitmap,backgroundImage.getWidth(),backgroundImage.getHeight());
+                tempBitmap = Bitmap.createBitmap(outPutBitmap,0,0,outPutBitmap.getWidth(), outPutBitmap.getHeight(),scaleImage(outPutBitmap),true);
+                //tempBitmap = BitmapUtils.BITMAP_RESIZER(outPutBitmap,backgroundImage.getWidth(),backgroundImage.getHeight());
                 backgroundImage.setImageBitmap(tempBitmap);
                 float originalWidth = originalBitmap.getWidth();
                 float tempWidth = tempBitmap.getWidth();
@@ -287,15 +309,6 @@ public class EditActivity extends AppCompatActivity implements FrameDialog.onFra
         dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
     }
 
-    @Override
-    public void onWidthChange(int width, int color,int dpCorner) {
-        frameWidth = (int)(width/dif);
-        frameColor = color;
-        frameCornerDp = (int)(dpCorner/dif);
-
-        //BitmapDrawable drawable = new BitmapDrawable(getResources(), getRoundedCornerBitmap(outPutBitmap,color,dpCorner,width));
-        backgroundImage.setImageBitmap(getRoundedCornerBitmap(tempBitmap,color,frameWidth,frameCornerDp,true));
-    }
 
     @Override
     public void onDone(String inputText, int colorCode, int backgroundColor, Typeface typeface, CustomTextViewOutline strokedEditText) {
@@ -364,6 +377,7 @@ public class EditActivity extends AppCompatActivity implements FrameDialog.onFra
 
     @Override
     public void onToolSelected(ToolType toolType) {
+
         switch(toolType){
             case COLOR:
                 openColorPicker();
@@ -377,36 +391,45 @@ public class EditActivity extends AppCompatActivity implements FrameDialog.onFra
                 dialog.show(getSupportFragmentManager(),"");
                 break;
             case FRAME:
-                FrameDialog frameDialog = new FrameDialog();
-                frameDialog.setSelectFrameColor(frameColor);
+                //FrameDialog frameDialog = new FrameDialog();
+                frameRunnable = new FrameDimsRunnable();
+                frameHandler = new Handler();
+                frameHandler.post(frameRunnable);
+                /*frameDialog.setSelectFrameColor(frameColor);
                 frameDialog.setFrameWidth(frameWidth);
                 frameDialog.setFrameCorners(frameCornerDp);
-                frameDialog.show(getSupportFragmentManager(),"");
+                frameDialog.show(getSupportFragmentManager(),"");*/
                 break;
             case FILTER:
                 displayThumbnail(outPutBitmap);
-                AddFilterDailog dialogFilters = new AddFilterDailog(list);
-                dialogFilters.setBitmap(originalBitmap);
-                dialogFilters.show(getSupportFragmentManager(),"");
-                bottomTools.setVisibility(View.GONE);
+
                 break;
             case BRIGHTNESS:
-                subFilterDialog = new SubFilterDialog();
+                subFilterRunnable = new SubFilterRunnable(ToolType.BRIGHTNESS,this);
+                subFilgerHandler = new Handler();
+                subFilgerHandler.post(subFilterRunnable);
+                /*subFilterDialog = new SubFilterDialog();
                 subFilterDialog.setToolType(ToolType.BRIGHTNESS);
                 subFilterDialog.show(getSupportFragmentManager(),"");
-                bottomTools.setVisibility(View.GONE);
+                bottomTools.setVisibility(View.GONE);*/
                 break;
             case CONTRAST:
-                subFilterDialog = new SubFilterDialog();
+                subFilterRunnable = new SubFilterRunnable(ToolType.CONTRAST,this);
+                subFilgerHandler = new Handler();
+                subFilgerHandler.post(subFilterRunnable);
+                /*subFilterDialog = new SubFilterDialog();
                 subFilterDialog.setToolType(ToolType.CONTRAST);
                 subFilterDialog.show(getSupportFragmentManager(),"");
-                bottomTools.setVisibility(View.GONE);
+                bottomTools.setVisibility(View.GONE);*/
                 break;
             case SATURATION:
-                subFilterDialog = new SubFilterDialog();
+                subFilterRunnable = new SubFilterRunnable(ToolType.SATURATION,this);
+                subFilgerHandler = new Handler();
+                subFilgerHandler.post(subFilterRunnable);
+                /*subFilterDialog = new SubFilterDialog();
                 subFilterDialog.setToolType(ToolType.SATURATION);
                 subFilterDialog.show(getSupportFragmentManager(),"");
-                bottomTools.setVisibility(View.GONE);
+                bottomTools.setVisibility(View.GONE);*/
                 break;
         }
     }
@@ -427,7 +450,7 @@ public class EditActivity extends AppCompatActivity implements FrameDialog.onFra
     @Override
     public void onFilterSelected(Filter filter) {
         //outPutBitmap = this.originalBitmap.copy(Bitmap.Config.ARGB_8888,true);
-        tempBitmap = BitmapUtils.BITMAP_RESIZER(outPutBitmap,(int)(originalWidth*0.5f),(int)(originalHeight*0.5f));
+        tempBitmap = Bitmap.createBitmap(outPutBitmap,0,0,outPutBitmap.getWidth(), outPutBitmap.getHeight(),scaleImage(outPutBitmap),true);
         backgroundImage.setImageBitmap(null);
         //filteredBitmap = filter.processFilter(filteredBitmap);
         /*if(frameCornerDp> 0 || frameWidth >0 ){
@@ -477,7 +500,7 @@ public class EditActivity extends AppCompatActivity implements FrameDialog.onFra
         if(apply){
             outPutBitmap = this.originalBitmap.copy(Bitmap.Config.ARGB_8888,true);
             outPutBitmap = filter.processFilter(outPutBitmap);
-            tempBitmap = BitmapUtils.BITMAP_RESIZER(outPutBitmap,(int)(originalWidth*0.5f),(int)(originalHeight*0.5f));
+            tempBitmap = Bitmap.createBitmap(outPutBitmap,0,0,outPutBitmap.getWidth(), outPutBitmap.getHeight(),scaleImage(outPutBitmap),true);
             //task = new saveImageTask(this,this);
             //dialog = ProgressDialog.show(this, "",
                     //getResources().getString(R.string.edit_progress_dialog_message), true);
@@ -496,7 +519,7 @@ public class EditActivity extends AppCompatActivity implements FrameDialog.onFra
         }else{
             //outPutBitmap = originalBitmap.copy(originalBitmap.getConfig(),true);
             //stickerView.setBackground(new BitmapDrawable(getResources(),outPutBitmap));
-            tempBitmap = BitmapUtils.BITMAP_RESIZER(outPutBitmap,(int)(originalWidth*0.5f),(int)(originalHeight*0.5f));
+            tempBitmap = Bitmap.createBitmap(outPutBitmap,0,0,outPutBitmap.getWidth(), outPutBitmap.getHeight(),scaleImage(outPutBitmap),true);
             /*if(frameCornerDp > 0 || frameWidth >0){
                 //temp_bitmap = getRoundedCornerBitmap(bitmap,frameColor,frameCornerDp,frameWidth);
                 backgroundImage.setImageBitmap(getRoundedCornerBitmap(tempBitmap,frameColor,frameCornerDp,frameWidth));
@@ -509,162 +532,6 @@ public class EditActivity extends AppCompatActivity implements FrameDialog.onFra
         list.clear();
     }
 
-
-
-    @Override
-    public void onBrightnessChanged(int brightness) {
-        this.brightness = brightness;
-        final Filter newFilter = new Filter();
-        newFilter.addSubFilter(new BrightnessSubFilter(this.brightness));
-        /*if(frameWidth > 0 || frameCornerDp > 0){
-            /*stickerView.setBackground(new BitmapDrawable(getResources(),getRoundedCornerBitmap(newFilter.processFilter(outPutBitmap.copy(Bitmap.Config.ARGB_8888,true )),frameColor,
-                    frameCornerDp,frameWidth)));*/
-            /*backgroundImage.setImageBitmap(getRoundedCornerBitmap(newFilter.processFilter(tempBitmap.copy(Bitmap.Config.ARGB_8888,true )),frameColor,
-                    frameCornerDp,frameWidth));
-        }else{
-            //outPutBitmap = newFilter.processFilter(outPutBitmap.copy(Bitmap.Config.ARGB_8888,true));
-            //stickerView.setBackground(new BitmapDrawable(getResources(),newFilter.processFilter(outPutBitmap.copy(Bitmap.Config.ARGB_8888,true ))));
-            backgroundImage.setImageBitmap(newFilter.processFilter(tempBitmap.copy(Bitmap.Config.ARGB_8888,true )));
-        }*/
-        applyBitmapChanges(newFilter.processFilter(tempBitmap.copy(Bitmap.Config.ARGB_8888,true )));
-    }
-
-    @Override
-    public void onContrastChanged(float contrast) {
-        this.contrast = contrast;
-        final Filter newFilter = new Filter();
-        newFilter.addSubFilter(new ContrastSubFilter(this.contrast));
-       /* if(frameWidth > 0 || frameCornerDp > 0){
-            /*stickerView.setBackground(new BitmapDrawable(getResources(),getRoundedCornerBitmap(newFilter.processFilter(outPutBitmap.copy(Bitmap.Config.ARGB_8888,true )),frameColor,
-                    frameCornerDp,frameWidth)));*/
-            /*backgroundImage.setImageBitmap(getRoundedCornerBitmap(newFilter.processFilter(tempBitmap.copy(Bitmap.Config.ARGB_8888,true )),frameColor,
-                    frameCornerDp,frameWidth));
-       /* }else{
-            //outPutBitmap = newFilter.processFilter(outPutBitmap.copy(Bitmap.Config.ARGB_8888,true));
-            //stickerView.setBackground(new BitmapDrawable(getResources(),newFilter.processFilter(outPutBitmap.copy(Bitmap.Config.ARGB_8888,true ))));
-            backgroundImage.setImageBitmap(newFilter.processFilter(tempBitmap.copy(Bitmap.Config.ARGB_8888,true )));
-        }*/
-        applyBitmapChanges(newFilter.processFilter(tempBitmap.copy(Bitmap.Config.ARGB_8888,true )));
-    }
-
-    @Override
-    public void onSaturationChanged(float saturation) {
-        this.saturation = saturation;
-        Filter newFilter = new Filter();
-        newFilter.addSubFilter(new SaturationSubfilter(saturation));
-        /*if(frameWidth > 0 || frameCornerDp > 0){
-            /*stickerView.setBackground(new BitmapDrawable(getResources(),getRoundedCornerBitmap(newFilter.processFilter(outPutBitmap.copy(Bitmap.Config.ARGB_8888,true )),frameColor,
-                    frameCornerDp,frameWidth)));*/
-            /*backgroundImage.setImageBitmap(getRoundedCornerBitmap(newFilter.processFilter(tempBitmap.copy(Bitmap.Config.ARGB_8888,true )),frameColor,
-                    frameCornerDp,frameWidth));
-        }else{
-            //outPutBitmap = newFilter.processFilter(outPutBitmap.copy(Bitmap.Config.ARGB_8888,true));
-            //stickerView.setBackground(new BitmapDrawable(getResources(),newFilter.processFilter(outPutBitmap.copy(Bitmap.Config.ARGB_8888,true ))));
-            backgroundImage.setImageBitmap(newFilter.processFilter(tempBitmap.copy(Bitmap.Config.ARGB_8888,true )));
-        }*/
-        applyBitmapChanges(newFilter.processFilter(tempBitmap.copy(Bitmap.Config.ARGB_8888,true )));
-    }
-
-    @Override
-    public void applyBrightness(int brightness, boolean apply) {
-        if (apply){
-            //outPutBitmap = originalBitmap.copy(originalBitmap.getConfig(),true);
-            Log.e("FACK","FACK");
-            this.brightness = brightness;
-            Filter newFilter = new Filter();
-            newFilter.addSubFilter(new BrightnessSubFilter(this.brightness));
-            outPutBitmap = newFilter.processFilter(outPutBitmap.copy(Bitmap.Config.ARGB_8888,true ));
-            //tempBitmap = Bitmap.createBitmap(outPutBitmap,0,0,outPutBitmap.getWidth(), outPutBitmap.getHeight(),scaleImage(outPutBitmap),true);
-            /*if(frameCornerDp>0 || frameWidth >0){
-                //stickerView.setBackground(new BitmapDrawable(getResources(),getRoundedCornerBitmap(outPutBitmap,frameColor,frameCornerDp,frameWidth)));
-                backgroundImage.setImageBitmap(getRoundedCornerBitmap(tempBitmap,frameColor,frameCornerDp,frameWidth));
-            }
-            else{
-                //stickerView.setBackground(new BitmapDrawable(getResources(),outPutBitmap));
-                backgroundImage.setImageBitmap(tempBitmap);
-            }*/
-            applyBitmapChanges(newFilter.processFilter(tempBitmap));
-
-        }else{
-            //stickerView.setBackgroundColor(0x00000000);
-            /*if(frameCornerDp > 0 || frameWidth >0){
-                //temp_bitmap = getRoundedCornerBitmap(bitmap,frameColor,frameCornerDp,frameWidth);
-                backgroundImage.setImageBitmap(getRoundedCornerBitmap(tempBitmap,frameColor,frameCornerDp,frameWidth));
-            }else{
-                backgroundImage.setImageBitmap(tempBitmap);
-            }*/
-            applyBitmapChanges(tempBitmap);
-        }
-        bottomTools.setVisibility(View.VISIBLE);
-    }
-
-    @Override
-    public void applyContrast(float contrast, boolean apply) {
-        if (apply){
-            //outPutBitmap = originalBitmap.copy(originalBitmap.getConfig(),true);
-            tempBitmap = BitmapUtils.BITMAP_RESIZER(outPutBitmap,(int)(originalWidth*0.5f),(int)(originalHeight*0.5f));
-            this.contrast = contrast;
-            Filter newFilter = new Filter();
-            newFilter.addSubFilter(new ContrastSubFilter(this.contrast));
-            outPutBitmap = newFilter.processFilter(outPutBitmap.copy(Bitmap.Config.ARGB_8888,true ));
-            //tempBitmap = Bitmap.createBitmap(outPutBitmap,0,0,outPutBitmap.getWidth(), outPutBitmap.getHeight(),scaleImage(outPutBitmap),true);
-            /*if(frameCornerDp>0 || frameWidth >0){
-                //stickerView.setBackground(new BitmapDrawable(getResources(),getRoundedCornerBitmap(outPutBitmap,frameColor,frameCornerDp,frameWidth)));
-                backgroundImage.setImageBitmap(getRoundedCornerBitmap(tempBitmap,frameColor,frameCornerDp,frameWidth));
-            }
-            else{
-                //stickerView.setBackground(new BitmapDrawable(getResources(),outPutBitmap));
-                backgroundImage.setImageBitmap(tempBitmap);
-            }*/
-            applyBitmapChanges(newFilter.processFilter(tempBitmap));
-
-        }else{
-            //stickerView.setBackgroundColor(0x00000000);
-            /*if(frameCornerDp > 0 || frameWidth >0){
-                //temp_bitmap = getRoundedCornerBitmap(bitmap,frameColor,frameCornerDp,frameWidth);
-                backgroundImage.setImageBitmap(getRoundedCornerBitmap(tempBitmap,frameColor,frameCornerDp,frameWidth));
-            }else{
-                backgroundImage.setImageBitmap(tempBitmap);
-            }*/
-            applyBitmapChanges(tempBitmap);
-        }
-        bottomTools.setVisibility(View.VISIBLE);
-    }
-
-    @Override
-    public void applySaturation(float saturation, boolean apply) {
-
-        if (apply){
-            Log.e("saturation",saturation+"");
-            this.saturation = saturation;
-            Filter newFilter = new Filter();
-            newFilter.addSubFilter(new SaturationSubfilter(this.saturation));
-            outPutBitmap = newFilter.processFilter(outPutBitmap.copy(Bitmap.Config.ARGB_8888,true ));
-            //bitmap = filteredBitmap.copy(Bitmap.Config.ARGB_8888,false);
-            //tempBitmap = Bitmap.createBitmap(outPutBitmap,0,0,outPutBitmap.getWidth(), outPutBitmap.getHeight(),scaleImage(outPutBitmap),true);
-            /*if(frameCornerDp>0 || frameWidth >0){
-                //stickerView.setBackground(new BitmapDrawable(getResources(),getRoundedCornerBitmap(outPutBitmap,frameColor,frameCornerDp,frameWidth)));
-                backgroundImage.setImageBitmap(getRoundedCornerBitmap(tempBitmap,frameColor,frameCornerDp,frameWidth));
-            }
-            else{
-                //stickerView.setBackground(new BitmapDrawable(getResources(),outPutBitmap));
-                backgroundImage.setImageBitmap(tempBitmap);
-            }*/
-            applyBitmapChanges(newFilter.processFilter(tempBitmap));
-
-        }else{
-            //stickerView.setBackgroundColor(0x00000000);
-            /*if(frameCornerDp > 0 || frameWidth >0){
-                //temp_bitmap = getRoundedCornerBitmap(bitmap,frameColor,frameCornerDp,frameWidth);
-                backgroundImage.setImageBitmap(getRoundedCornerBitmap(tempBitmap,frameColor,frameCornerDp,frameWidth));
-            }else{
-                backgroundImage.setImageBitmap(tempBitmap);
-            }*/
-            applyBitmapChanges(tempBitmap);
-        }
-        bottomTools.setVisibility(View.VISIBLE);
-
-    }
     private class saveImageTask extends AsyncTask<Bitmap,Void,Void>{
         private EditActivity activity;
         private Context context;
@@ -683,34 +550,6 @@ public class EditActivity extends AppCompatActivity implements FrameDialog.onFra
             Bitmap stickerBitmap = bitmaps[1];
             Canvas canvas = new Canvas(outputBitmap);
             if(this.frameCornerDp > 0 || frameWidth >0){
-                /*Bitmap temp = Bitmap.createBitmap(activity.tempBitmap.getWidth(),activity.tempBitmap.getHeight(), Bitmap.Config.ARGB_8888);
-                Canvas tempCanvas = new Canvas(temp);
-                tempCanvas.drawColor(0x00000000);
-                Log.e("frame_dims",this.frameCornerDp+"x"+this.frameWidth);
-                tempCanvas.drawBitmap(activity.getRoundedCornerBitmap(temp, this.frameColor,this.frameCornerDp,this.frameWidth,false),new Matrix(),null);
-                //temp = activity.getRoundedCornerBitmap(temp, this.frameColor,this.frameCornerDp,this.frameWidth);
-                temp = activity.getResizedBitmap(temp,outputBitmap.getWidth(),outputBitmap.getHeight());
-                canvas.drawBitmap(activity.outPutBitmap,new Matrix(), null);
-                canvas.drawBitmap(temp,new Matrix(),null);
-                /*int tempBitmapWith = activity.tempBitmap.getWidth();
-                int tempBitmapHeihgt = activity.tempBitmap.getHeight();
-                //int difWidth = (int)(tempBitmapWith +(100*(tempBitmapWith/activity.outPutBitmap.getWidth())));
-                float percentageDifWidth = tempBitmapWith/activity.outPutBitmap.getWidth();
-                float percentageDifHeight = tempBitmapHeihgt/activity.outPutBitmap.getHeight();
-                if(frameWidth > 0){
-                    frameWidth += frameWidth*percentageDifWidth;
-                }
-                if (frameCornerDp >0){
-                    frameCornerDp += frameCornerDp*percentageDifWidth;
-                }*/
-                /*float originalWidth = originalBitmap.getWidth();
-                float tempWidth = activity.tempBitmap.getWidth();
-                float dif = originalWidth/tempWidth;
-                Log.e("frame_dif",frameWidth+"x"+dif+"");
-                double newValues= (frameWidth*dif);
-                frameWidth = (int)newValues;
-                frameCornerDp = (int)newValues;
-                Log.e("frame_dif",frameWidth+"x"+dif+""+newValues);*/
                 canvas.drawBitmap(activity.getRoundedCornerBitmap(activity.outPutBitmap,this.frameColor,this.frameCornerDp,this.frameWidth,false), new Matrix(), null);
             }else{
                 canvas.drawBitmap(activity.outPutBitmap, new Matrix(), null);
@@ -722,6 +561,7 @@ public class EditActivity extends AppCompatActivity implements FrameDialog.onFra
 
         @Override
         protected void onPostExecute(Void aVoid) {
+            activity.mInterstitialAd.show();
             activity.dialog.dismiss();
             activity.finish();
             Toast.makeText(context,getResources().getString(R.string.edit_image_saved_message)+ Constants.savedImagesPath,Toast.LENGTH_LONG).show();
@@ -735,48 +575,47 @@ public class EditActivity extends AppCompatActivity implements FrameDialog.onFra
         Runnable r = new Runnable() {
             @Override
             public void run() {
+                Log.e("filter list","on display");
+                Bitmap thumbImg;
+                int width = (int) (bitmap.getWidth()*0.6);
+                int height = (int)(bitmap.getHeight()*0.6);
+                float dp = 80;
+                //Resources r = getResources();
 
+                float px = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, getResources().getDisplayMetrics());
+                thumbImg = ImageUtilities.createSquaredBitmap(bitmap,width);
+                //thumbImg = ImageUtilities.getResizedBitmap(bitmap,width,height);
+
+                Log.e("thumb_nails_dims",width+"x"+height);
+                ThumbnailsManager.clearThumbs();
+                //list.clear();
+                ThumbnailItem thumbnailItem = new ThumbnailItem();
+                thumbnailItem.image = thumbImg;
+                thumbnailItem.filterName = "normal";
+                ThumbnailsManager.addThumb(thumbnailItem);
+                List<Filter> filters = FilterPack.getFilterPack(EditActivity.this);
+                for(Filter filter:filters){
+                    ThumbnailItem tI = new ThumbnailItem();
+                    tI.image = thumbImg;
+                    tI.filter = filter;
+                    tI.filterName = filter.getName();
+                    ThumbnailsManager.addThumb(tI);
+                }
+
+                list.addAll(ThumbnailsManager.processThumbs(EditActivity.this));
+                AddFilterDailog dialogFilters = new AddFilterDailog(list);
+                dialogFilters.setBitmap(originalBitmap);
+                dialogFilters.show(getSupportFragmentManager(),"");
+                //bottomTools.setVisibility(View.GONE);
+                Log.e("filters_size",list.size()+"");
             }
         };
-        Log.e("filter list","on display");
-        Bitmap thumbImg;
-        int width = (int) (bitmap.getWidth()*0.6);
-        int height = (int)(bitmap.getHeight()*0.6);
-        float dp = 80;
-        //Resources r = getResources();
 
-        float px = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, getResources().getDisplayMetrics());
-        thumbImg = ImageUtilities.createSquaredBitmap(bitmap,width);
-        //thumbImg = ImageUtilities.getResizedBitmap(bitmap,width,height);
-
-        Log.e("thumb_nails_dims",width+"x"+height);
-        ThumbnailsManager.clearThumbs();
-        //list.clear();
-        ThumbnailItem thumbnailItem = new ThumbnailItem();
-        thumbnailItem.image = thumbImg;
-        thumbnailItem.filterName = "normal";
-        ThumbnailsManager.addThumb(thumbnailItem);
-        List<Filter> filters = FilterPack.getFilterPack(this);
-        for(Filter filter:filters){
-            ThumbnailItem tI = new ThumbnailItem();
-            tI.image = thumbImg;
-            tI.filter = filter;
-            tI.filterName = filter.getName();
-            ThumbnailsManager.addThumb(tI);
-        }
-
-        list.addAll(ThumbnailsManager.processThumbs(this));
-        Log.e("filters_size",list.size()+"");
-        /*getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                adapter.notifyDataSetChanged();
-            }
-        });*/
-        //new Thread(r).start();
+        new Handler().post(r);
     }
     @Override
     protected void onDestroy() {
+
         if(task != null){
             task.cancel(true);
         }
@@ -809,5 +648,119 @@ public class EditActivity extends AppCompatActivity implements FrameDialog.onFra
         transformation.postTranslate(xTranslation, yTranslation);
         transformation.preScale(scale, scale);
         return transformation;
+    }
+    class FrameDimsRunnable implements Runnable, FrameDialog.onFrameWidthListener{
+        private FrameDialog dialog;
+
+        @Override
+        public void run() {
+            dialog = new FrameDialog(this);
+            dialog.setSelectFrameColor(frameColor);
+            dialog.setFrameWidth(frameWidth);
+            dialog.setFrameCorners(frameCornerDp);
+            dialog.show(getSupportFragmentManager(),"");
+        }
+
+       @Override
+        public void onWidthChange(int width, int color, int dpCorners) {
+            frameWidth = (int)(width/dif);
+            frameColor = color;
+            frameCornerDp = (int)(dpCorners/dif);
+            drawFrame = true;
+            backgroundImage.setImageBitmap(getRoundedCornerBitmap(tempBitmap,frameColor,frameCornerDp,frameWidth,true));
+        }
+
+    }
+    class SubFilterRunnable implements Runnable, SubFilterDialog.onSubFilterListener{
+        private ToolType toolType;
+        private EditActivity activity;
+        SubFilterRunnable(ToolType toolType, EditActivity activity){
+            this.toolType = toolType;
+            this.activity = activity;
+        }
+        @Override
+        public void run() {
+            subFilterDialog = new SubFilterDialog(this);
+            subFilterDialog.setToolType(toolType);
+            subFilterDialog.show(getSupportFragmentManager(),"");
+            bottomTools.setVisibility(View.INVISIBLE);
+        }
+        @Override
+        public void onBrightnessChanged(int brightness) {
+            activity.brightness = brightness;
+            final Filter newFilter = new Filter();
+            newFilter.addSubFilter(new BrightnessSubFilter(activity.brightness));
+            applyBitmapChanges(newFilter.processFilter(tempBitmap.copy(Bitmap.Config.ARGB_8888,true )));
+        }
+
+        @Override
+        public void onContrastChanged(float contrast) {
+            activity.contrast = contrast;
+            final Filter newFilter = new Filter();
+            newFilter.addSubFilter(new ContrastSubFilter(activity.contrast));
+            applyBitmapChanges(newFilter.processFilter(tempBitmap.copy(Bitmap.Config.ARGB_8888,true )));
+        }
+
+        @Override
+        public void onSaturationChanged(float saturation) {
+            activity.saturation = saturation;
+            Filter newFilter = new Filter();
+            newFilter.addSubFilter(new SaturationSubfilter(saturation));
+            applyBitmapChanges(newFilter.processFilter(tempBitmap.copy(Bitmap.Config.ARGB_8888,true )));
+        }
+
+        @Override
+        public void applyBrightness(int brightness, boolean apply) {
+            if (apply){
+                //outPutBitmap = originalBitmap.copy(originalBitmap.getConfig(),true);
+                Log.e("FACK","FACK");
+                activity.brightness = brightness;
+                Filter newFilter = new Filter();
+                newFilter.addSubFilter(new BrightnessSubFilter(activity.brightness));
+                outPutBitmap = newFilter.processFilter(outPutBitmap.copy(Bitmap.Config.ARGB_8888,true ));
+                //tempBitmap = Bitmap.createBitmap(outPutBitmap,0,0,outPutBitmap.getWidth(), outPutBitmap.getHeight(),scaleImage(outPutBitmap),true);
+                applyBitmapChanges(newFilter.processFilter(tempBitmap));
+
+            }else{
+                applyBitmapChanges(tempBitmap);
+            }
+            bottomTools.setVisibility(View.VISIBLE);
+        }
+
+        @Override
+        public void applyContrast(float contrast, boolean apply) {
+            if (apply){
+                //outPutBitmap = originalBitmap.copy(originalBitmap.getConfig(),true);
+                tempBitmap = Bitmap.createBitmap(outPutBitmap,0,0,outPutBitmap.getWidth(), outPutBitmap.getHeight(),scaleImage(outPutBitmap),true);
+                activity.contrast = contrast;
+                Filter newFilter = new Filter();
+                newFilter.addSubFilter(new ContrastSubFilter(activity.contrast));
+                outPutBitmap = newFilter.processFilter(outPutBitmap.copy(Bitmap.Config.ARGB_8888,true ));
+                applyBitmapChanges(newFilter.processFilter(tempBitmap));
+
+            }else{
+                applyBitmapChanges(tempBitmap);
+            }
+            bottomTools.setVisibility(View.VISIBLE);
+        }
+
+        @Override
+        public void applySaturation(float saturation, boolean apply) {
+
+            if (apply){
+                Log.e("saturation",saturation+"");
+                activity.saturation = saturation;
+                Filter newFilter = new Filter();
+                newFilter.addSubFilter(new SaturationSubfilter(activity.saturation));
+                outPutBitmap = newFilter.processFilter(outPutBitmap.copy(Bitmap.Config.ARGB_8888,true ));
+                applyBitmapChanges(newFilter.processFilter(tempBitmap));
+
+            }else{
+                applyBitmapChanges(tempBitmap);
+            }
+            bottomTools.setVisibility(View.VISIBLE);
+
+        }
+
     }
 }

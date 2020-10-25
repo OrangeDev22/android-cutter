@@ -127,13 +127,14 @@ public class ImageUtilities {
         }
         return Base64.encodeToString(byteArrayOS.toByteArray(), Base64.DEFAULT);
     }*/
-    public static String encodeImage(Bitmap image, Bitmap.CompressFormat compressFormat, int quality){
-        String directory = Environment.getExternalStorageDirectory()+"/inpaint/";
+    public static String encodeImage(Bitmap image, Bitmap.CompressFormat compressFormat, int quality,Context context){
+        //String directory = Environment.getExternalStorageDirectory()+"/inpaint/";
+        String directory = context.getFilesDir()+"/inpaint/";
         File f3=new File(directory);
         if(!f3.exists())
             f3.mkdirs();
         OutputStream outStream = null;
-        File file = new File(Environment.getExternalStorageDirectory() + "/inpaint/"+"seconds"+".png");
+        File file = new File(context.getFilesDir() + "/inpaint/"+"temp"+".png");
         String imageTempPath = "";
         try {
             outStream = new FileOutputStream(file);

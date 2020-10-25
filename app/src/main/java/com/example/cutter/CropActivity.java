@@ -431,7 +431,7 @@ public class CropActivity extends AppCompatActivity implements  DrawView.onImage
         @Override
         protected Bitmap doInBackground(Bitmap... bitmaps) {
             Bitmap bitmap = ImageUtilities.trim(bitmaps[0]);
-            activity.ImagePath = ImageUtilities.encodeImage(bitmap, Bitmap.CompressFormat.PNG,100);
+            //activity.ImagePath = ImageUtilities.encodeImage(bitmap, Bitmap.CompressFormat.PNG,100);
             //activity.im_crop_image.setBackground(new BitmapDrawable(activity.getResources(),bitmap));
             return  bitmap;
         }
@@ -533,7 +533,7 @@ public class CropActivity extends AppCompatActivity implements  DrawView.onImage
 
         @Override
         protected Void doInBackground(Bitmap... bitmaps) {
-            activity.ImagePath = ImageUtilities.encodeImage(bitmaps[0], Bitmap.CompressFormat.PNG,100);
+            //activity.ImagePath = ImageUtilities.encodeImage(bitmaps[0], Bitmap.CompressFormat.PNG,100);
             return null;
         }
         @Override
