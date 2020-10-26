@@ -43,7 +43,7 @@ import java.util.List;
 
 public class AddFilterDailog extends DialogFragment implements ThumbnailAdapter.FiltersListFragmentListener {
     private RecyclerView recyclerView;
-    private List<ThumbnailItem> list;
+    private List<ThumbnailItem> thumbnailItemList;
     private ThumbnailAdapter adapter;
     private Button positiveButton, negativeButton;
     private FiltersListFragmentListener listener;
@@ -51,8 +51,8 @@ public class AddFilterDailog extends DialogFragment implements ThumbnailAdapter.
     private boolean apply = false;
     public Bitmap bitmap;
     Filter filterSelected;
-    public AddFilterDailog(List<ThumbnailItem> list){
-        this.list = list;
+    public AddFilterDailog(List<ThumbnailItem> thumbnailItemList){
+        this.thumbnailItemList = thumbnailItemList;
     }
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -74,11 +74,8 @@ public class AddFilterDailog extends DialogFragment implements ThumbnailAdapter.
         LayoutInflater inflater = getActivity().getLayoutInflater();
         View view = inflater.inflate(R.layout.add_filter_dialog,null);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext(),RecyclerView.HORIZONTAL,false);
-        //list = new ArrayList<>();
-        filterSelected = list.get(0).filter;
-        adapter = new ThumbnailAdapter(list,this, getContext());
-        //displayThumbnail(bitmap);
-        Log.e("adapter_size",adapter.getItemCount()+"");
+        filterSelected = thumbnailItemList.get(0).filter;
+        adapter = new ThumbnailAdapter(thumbnailItemList,this, getContext());
         positiveButton = view.findViewById(R.id.dialog_filter_positive_button);
         negativeButton = view.findViewById(R.id.dialog_filter_negative_button);
         recyclerView = view.findViewById(R.id.recycler_view_filters);
@@ -90,8 +87,6 @@ public class AddFilterDailog extends DialogFragment implements ThumbnailAdapter.
         negativeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //filterSelected = list.get(0).filter;
-                //dialogListener.setFilter(filterSelected);
                 apply = false;
                 dismiss();
             }
@@ -136,66 +131,17 @@ public class AddFilterDailog extends DialogFragment implements ThumbnailAdapter.
         adapter.setSelectedFilter(position);
         filterSelected = filter;
         listener.onFilterSelected(filter);
-        //dialogListener.FilterSelected(position);
     }
     public void setBitmap(Bitmap bitmap){
         this.bitmap = bitmap;
     }
-    public void displayThumbnail(final Bitmap bitmap){
 
-        Runnable r = new Runnable() {
-            @Override
-            public void run() {
-
-            }
-        };
-        Log.e("filter list","on display");
-        Bitmap thumbImg;
-        int width = (int) (bitmap.getWidth()*0.6);
-        int height = (int)(bitmap.getHeight()*0.6);
-        float dp = 80;
-        //Resources r = getResources();
-
-        float px = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, getResources().getDisplayMetrics());
-        thumbImg = ImageUtilities.createSquaredBitmap(bitmap,width);
-        //thumbImg = ImageUtilities.getResizedBitmap(bitmap,width,height);
-
-        Log.e("thumb_nails_dims",width+"x"+height);
-        ThumbnailsManager.clearThumbs();
-        //list.clear();
-        ThumbnailItem thumbnailItem = new ThumbnailItem();
-        thumbnailItem.image = thumbImg;
-        thumbnailItem.filterName = "normal";
-        ThumbnailsManager.addThumb(thumbnailItem);
-        List<Filter> filters = FilterPack.getFilterPack(getContext());
-        for(Filter filter:filters){
-            ThumbnailItem tI = new ThumbnailItem();
-            tI.image = thumbImg;
-            tI.filter = filter;
-            tI.filterName = filter.getName();
-            ThumbnailsManager.addThumb(tI);
-        }
-
-        list.addAll(ThumbnailsManager.processThumbs(getActivity()));
-        Log.e("filters_size",list.size()+"");
-        /*getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                adapter.notifyDataSetChanged();
-            }
-        });*/
-        filterSelected = list.get(0).filter;
-        adapter = new ThumbnailAdapter(list,this, getContext());
-        //new Thread(r).start();
-    }
     public interface onDialogFilterListener{
         void setFilter(Filter filter,boolean apply);
-        void FilterSelected(int position);
     }
 
     @Override
     public void onDestroyView() {
-        //filterSelected = list.get(0).filter;
         dialogListener.setFilter(filterSelected,apply);
         super.onDestroyView();
     }

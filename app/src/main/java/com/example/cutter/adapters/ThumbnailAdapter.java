@@ -2,7 +2,6 @@ package com.example.cutter.adapters;
 
 import android.content.Context;
 import android.graphics.drawable.BitmapDrawable;
-import android.nfc.Tag;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,10 +11,8 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
-import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.cutter.FilterListFragment;
 import com.example.cutter.R;
 import com.zomato.photofilters.imageprocessors.Filter;
 import com.zomato.photofilters.utils.ThumbnailItem;
@@ -55,26 +52,22 @@ public class ThumbnailAdapter extends RecyclerView.Adapter<ThumbnailAdapter.View
             @Override
             public void onClick(View v) {
                 listener.onFilterSelected(position,thumbnailItems.get(position).filter);
-                //notifyDataSetChanged();
             }
         });
         if(selectedIndext == position){
             holder.filter_name.setTextColor(ContextCompat.getColor(context, R.color.colorAccent));
-            holder.thumbnail.setBackground(drawable);
         }
         else{
             holder.filter_name.setTextColor(ContextCompat.getColor(context, R.color.white));
-            holder.thumbnail.setBackground(drawable);
         }
+        holder.thumbnail.setBackground(drawable);
     }
 
     @Override
     public int getItemCount() {
         return thumbnailItems.size();
     }
-    public interface OnItemSelected{
-        void onFilterSelected(int position);
-    }
+
     public  class ViewHolder extends RecyclerView.ViewHolder{
         public ImageView thumbnail;
         TextView filter_name;

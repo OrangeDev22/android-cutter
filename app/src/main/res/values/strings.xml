@@ -6,6 +6,7 @@
     <string name="text_view_gallery">Open Gallery</string>
     <string name="text_view_take_picture">Use Camera</string>
     <string name="null_image_message">Invalid file. Please select a valid image</string>
+    <string name="main_message">Hello! we are a small group of developers. We promised that we will update this app and add new features. If you have any issue feel free to mail us at: OrangeDev8@gmail.com</string>
     <!--            dialogsButtons              -->
     <string name="positive_button_filter">Confirm</string>
     <string name="negative_button_filter">Cancel</string>
@@ -20,8 +21,12 @@
     <string name="edit_bottom_menu_add_brightness">Brightness</string>
     <string name="edit_bottom_menu_add_contrast">Contrast</string>
     <string name="edit_bottom_menu_add_saturation">Saturation</string>
+    <string name="edit_bottom_menu_add_vignette">Vignette</string>
     <string name="edit_progress_dialog_message">Saving image please wait...</string>
     <string name="edit_image_saved_message">Image Saved at: </string>
+    <string name="edit_text_view_option_contrast">Contrast</string>
+    <string name="edit_text_view_option_saturation">Saturation</string>
+    <string name="edit_text_view_option_brightness">Brightness</string>
     <string name="edit_text_hint">Text Example</string>
     <!--                AddFrameDialog                  -->
     <string name="text_view_frame_corner">Corners</string>
@@ -36,4 +41,10 @@
     <string name="crop_activity_progress_dialog_message">Loading please wait...</string>
     <string name="bottom_crop_menu_ratio">Aspect Ratio</string>
     <string name="bottom_crop_aspect_ratio_all">All</string>
+    <!--            ACRA LIBRARY            -->
+    <string name="acra_notification_tittle">The app stopped working please send a report</string>
+    <string name="acra_notification_text">Something went wrong. please click on accept and send the log file to the developers</string>
+    <string name="acra_send_button_text">Send Report</string>
+    <string name="acra_discard_button_text">Don\'t send report</string>
+    <string name="acra_chanel_name">Notification</string>
 </resources>

@@ -23,6 +23,7 @@ public class FontsAdapter extends RecyclerView.Adapter<FontsAdapter.ViewHolder> 
     private OnItemSelected mOnItemSelected;
     private Context mContext;
     int index;
+
     public FontsAdapter(OnItemSelected onItemSelected, List<Typeface> typeFaces, Context context) {
         mOnItemSelected = onItemSelected;
         mTypefaces = typeFaces;
@@ -45,20 +46,16 @@ public class FontsAdapter extends RecyclerView.Adapter<FontsAdapter.ViewHolder> 
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+
         holder.txtTool.setTypeface(mTypefaces.get(position));
         holder.relativeLayout.setBackground(ContextCompat.getDrawable(mContext,R.drawable.rounded_background));
         holder.txtTool.setTextColor(ContextCompat.getColor(mContext, R.color.white));
-        //If font is selected then background and text color will change
         holder.txtTool.setTypeface(mTypefaces.get(position));
-
-        //If font is selected then background and text color will change
         if (index == position){
-            Log.d("Font Position", index+"");
             holder.relativeLayout.setBackground(ContextCompat.getDrawable(mContext,R.drawable.rounded_background_selected));
-            //holder.txtTool.setTextColor(ContextCompat.getColor(mContext, R.color.black));
         }
     }
-    //Method Called to change the poisition of the selected font
+
     public void setSelectedFont (int position){
         index = position;
         notifyDataSetChanged();

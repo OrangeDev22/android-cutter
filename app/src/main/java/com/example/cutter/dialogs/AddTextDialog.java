@@ -12,7 +12,6 @@ import android.graphics.Rect;
 import android.graphics.Shader;
 import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
-import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -28,14 +27,12 @@ import android.widget.SeekBar;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
 import androidx.fragment.app.DialogFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.cutter.R;
 import com.example.cutter.adapters.FontsAdapter;
-import com.example.cutter.fragments.TextEditorDialogFragment;
 import com.example.cutter.views.CustomTextViewOutline;
 import com.madrapps.pikolo.ColorPicker;
 import com.madrapps.pikolo.listeners.SimpleColorSelectionListener;
@@ -47,9 +44,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AddTextDialog extends DialogFragment implements FontsAdapter.OnItemSelected{
-    public static final String TAG = TextEditorDialogFragment.class.getSimpleName();
-    public static final String EXTRA_INPUT_TEXT = "extra_input_text";
-    public static final String EXTRA_COLOR_CODE = "extra_color_code";
     private SeekBar seekBarSize;
     public CustomTextViewOutline mAddTextEditText;
     private FontsAdapter fontAdapter;
@@ -58,7 +52,6 @@ public class AddTextDialog extends DialogFragment implements FontsAdapter.OnItem
     private int mDefaultColor;
     private int mDefaultStrokeColor;
     private int gradientColor= Color.GREEN;
-    private int returnedColor;
     private String colorMode="TEXT_COLOR";
     private String textColor = "TEXT_COLOR",gradient="GRADIENT_COLOR";
     private TextEditor mTextEditor;
@@ -75,11 +68,17 @@ public class AddTextDialog extends DialogFragment implements FontsAdapter.OnItem
 
     }
 
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        getDialog().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+        mAddTextEditText.requestFocus();
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         getDialog().getWindow().requestFeature(Window.FEATURE_NO_TITLE);
-       // setStyle(DialogFragment.STYLE_NO_FRAME,R.style.fragmentNavBarColor);
         return super.onCreateView(inflater, container, savedInstanceState);
     }
 
@@ -89,9 +88,7 @@ public class AddTextDialog extends DialogFragment implements FontsAdapter.OnItem
         WindowManager.LayoutParams params = getDialog().getWindow().getAttributes();
         params.width = ViewGroup.LayoutParams.MATCH_PARENT;
         params.height = ViewGroup.LayoutParams.MATCH_PARENT;
-        //params.dimAmount = 0;
         params.gravity = Gravity.BOTTOM | Gravity.CENTER;
-        //getDialog().getWindow().setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.dark_transparent)));
         getDialog().getWindow().setAttributes((android.view.WindowManager.LayoutParams) params);
     }
 
@@ -100,39 +97,34 @@ public class AddTextDialog extends DialogFragment implements FontsAdapter.OnItem
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(),R.style.fragmentNavBarColor);
-        //setStyle(DialogFragment.STYLE_NO_FRAME,R.style.fragmentNavBarColor);
         LayoutInflater inflater = getActivity().getLayoutInflater();
         View view = inflater.inflate(R.layout.add_text_dialog,null);
         builder.setView(view)
                 .setTitle("");
-        fontPosition = 0;
-        colors = new ArrayList<>();
-        fontsList = new ArrayList<>();
-        fillFontList();
         //initialise the views
         mAddTextEditText = view.findViewById(R.id.add_text_edit_text2);
         mInputMethodManager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-        //bottomMenu = view.findViewById(R.id.botto);
         bottomOptions = view.findViewById(R.id.bottomFonts);
         seekBarSize = view.findViewById(R.id.seekBarOutline);
         imageViewDone = view.findViewById(R.id.imageViewDone);
-        //seekBarSize.setVisibility(View.GONE);
         imageViewTextColor = view.findViewById(R.id.imageViewTextColor);
         imageViewStroke = view.findViewById(R.id.imageViewTextStroke);
         imageViewTextGradient = view.findViewById(R.id.imageViewTextGradient);
         imageViewCloseDialog = view.findViewById(R.id.image_view_close_dialog);
+        fontPosition = 0;
+        colors = new ArrayList<>();
+        fontsList = new ArrayList<>();
+        fillFontList();
         setImageViewsClickListeners();
         mAddTextEditText.setDrawingCacheEnabled(true);
-
+        seekBarSize.setProgress(1);
+        seekBarSize.invalidate();
         seekBarSize.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 percentage = (float) (6*progress)/100;
                 mAddTextEditText.setStrokeWidth(percentage);
-                /*Log.e("stroke width", percentage+"");
-                Log.e("seekbar_progress", progress+"");*/
                 mAddTextEditText.invalidate();
-                //mAddTextEditText.setText(textMessage);
             }
 
             @Override
@@ -145,10 +137,8 @@ public class AddTextDialog extends DialogFragment implements FontsAdapter.OnItem
 
             }
         });
-        LinearLayoutManager llmTools = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
         fontAdapter = new FontsAdapter(this,fontsList, getContext());
         mDefaultColor = getResources().getColor(R.color.white);
-        //mAddTextEditText.setTypeface(fontsList.get(0));
         mDefaultStrokeColor =  getResources().getColor(R.color.black);
         mAddTextEditText.setStrokeColor(mDefaultStrokeColor);
         mAddTextEditText.setTextColor(mDefaultColor);
@@ -157,12 +147,12 @@ public class AddTextDialog extends DialogFragment implements FontsAdapter.OnItem
         bottomOptions.setLayoutManager(mLayoutManager);
         bottomOptions.setAdapter(fontAdapter);
         mAddTextEditText.setFocusable(true);
-        //openKeyboard();
         return builder.create();
     }
 
     @Override
     public void onFontSelected(int position) {
+        Log.d("add_text_dialog_font_pos",position+"");
         mAddTextEditText.setTypeface(fontsList.get(position));
         fontPosition = position;
         fontAdapter.setSelectedFont(fontPosition);
@@ -190,9 +180,7 @@ public class AddTextDialog extends DialogFragment implements FontsAdapter.OnItem
                                     @Override
                                     public void onColorSelected(ColorEnvelope envelope, boolean fromUser) {
 
-                                        //mAddTextEditText.setOutlineColor(envelope.getColor());
                                         backgroundColor = envelope.getColor();
-                                        //mAddTextEditText.setBackgroundColor(backgroundColor);
                                         mAddTextEditText.setStrokeColor(backgroundColor);
                                         mAddTextEditText.invalidate();
                                     }
@@ -223,7 +211,7 @@ public class AddTextDialog extends DialogFragment implements FontsAdapter.OnItem
                 if (!TextUtils.isEmpty(inputText) && mTextEditor != null) {
                     mAddTextEditText.clearFocus();
                     mAddTextEditText.clearComposingText();
-                    mTextEditor.onDone(inputText, mDefaultColor,backgroundColor, mAddTextEditText.getTypeface(), mAddTextEditText);
+                    mTextEditor.onEditTextDone(mAddTextEditText);
                 }
                 dismiss();
             }
@@ -260,7 +248,6 @@ public class AddTextDialog extends DialogFragment implements FontsAdapter.OnItem
                     }
                     gradientColor = color;
                     setGradient();
-                    //mAddTextEditText.invalidate();
                 }
             }
 
@@ -273,39 +260,31 @@ public class AddTextDialog extends DialogFragment implements FontsAdapter.OnItem
                 dialog.dismiss();
             }
         });
-        //getDialog().getWindow().setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.dark_transparent)));
-
-
     }
 
     private void fillFontList(){
+        fontsList.add(mAddTextEditText.getTypeface());
         fontsList.add(getResources().getFont(R.font.aligator));
         fontsList.add(getResources().getFont(R.font.all_the_roll_personal_use));
-        //fontsList.add(getResources().getFont(R.font.antonellie_callygraphy_demo));
         fontsList.add(getResources().getFont(R.font.autography));
         fontsList.add(getResources().getFont(R.font.bastball));
         fontsList.add(getResources().getFont(R.font.batmfa));
         fontsList.add(getResources().getFont(R.font.better_you_smile));
         fontsList.add(getResources().getFont(R.font.black_robins));
         fontsList.add(getResources().getFont(R.font.blacksword));
-        fontsList.add(getResources().getFont(R.font.blowbrush));
         fontsList.add(getResources().getFont(R.font.brighton_spring));
         fontsList.add(getResources().getFont(R.font.brigitter_eigner));
         fontsList.add(getResources().getFont(R.font.cherolina));
         fontsList.add(getResources().getFont(R.font.cute_gorilla));
-        fontsList.add(getResources().getFont(R.font.cute_pinkies));
         fontsList.add(getResources().getFont(R.font.cyberpunks));
         fontsList.add(getResources().getFont(R.font.dimbo_regular));
         fontsList.add(getResources().getFont(R.font.ds_digi));
         fontsList.add(getResources().getFont(R.font.firestarter));
         fontsList.add(getResources().getFont(R.font.gabrwffr));
-        fontsList.add(getResources().getFont(R.font.godofwar));
         fontsList.add(getResources().getFont(R.font.internet_friend));
         fontsList.add(getResources().getFont(R.font.japanese));
         fontsList.add(getResources().getFont(R.font.mangat));
         fontsList.add(getResources().getFont(R.font.marline_free));
-        fontsList.add(getResources().getFont(R.font.outrun));
-        fontsList.add(getResources().getFont(R.font.powerpuff_girls_font));
         fontsList.add(getResources().getFont(R.font.rhodeport_regular));
         fontsList.add(getResources().getFont(R.font.rockies));
         fontsList.add(getResources().getFont(R.font.space_age));
@@ -321,7 +300,6 @@ public class AddTextDialog extends DialogFragment implements FontsAdapter.OnItem
         Paint textPaint = mAddTextEditText.getPaint();
         textPaint.getTextBounds(mAddTextEditText.getText().toString(),0,mAddTextEditText.getText().length(),rect);
         int width = rect.width();
-        Log.e("text_view_dims",width+"-"+mAddTextEditText.getWidth());
         Shader textShader=new LinearGradient(0, 0, width, mAddTextEditText.getTextSize(),
                 new int[]{mDefaultColor,gradientColor},
                 null, Shader.TileMode.CLAMP);
@@ -329,7 +307,7 @@ public class AddTextDialog extends DialogFragment implements FontsAdapter.OnItem
         mAddTextEditText.invalidate();
     }
     public interface TextEditor {
-        void onDone(String inputText, int colorCode, int backgroundColor, Typeface typeface, CustomTextViewOutline strokedEditText);
+        void onEditTextDone(CustomTextViewOutline strokedEditText);
     }
     @Override
     public void onAttach(@NonNull Context context) {

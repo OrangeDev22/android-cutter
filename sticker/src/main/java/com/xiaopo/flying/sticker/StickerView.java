@@ -41,7 +41,7 @@ public class StickerView extends FrameLayout {
 
   private final boolean showIcons;
   private final boolean showBorder;
-  private final boolean bringToFrontCurrentSticker;
+  private boolean bringToFrontCurrentSticker;
 
   @IntDef({
       ActionMode.NONE, ActionMode.DRAG, ActionMode.ZOOM_WITH_TWO_FINGER, ActionMode.ICON,
@@ -874,6 +874,9 @@ public class StickerView extends FrameLayout {
 
     void onStickerDoubleTapped(@NonNull Sticker sticker);
   }
+    public void bringToFrontCurrentSticker() {
+        bringToFrontCurrentSticker = true;
+    }
 
 
 }

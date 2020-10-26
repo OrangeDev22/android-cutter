@@ -44,21 +44,9 @@
         android:hint="@string/edit_text_hint"
         android:textAlignment="center"
         android:textColor="@color/black"
-        android:textColorHint="@color/white"
         android:background="@color/transparent"
         android:textSize="40sp"
         />
-
-    <!--<EditText
-        android:id="@+id/editTextInput"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/transparent"
-        android:textColor="@color/transparent"
-        android:textSelectHandle="@drawable/texthandle"
-        android:cursorVisible="false"
-        app:layout_constraintBottom_toTopOf="@+id/linearLayout" />-->
-
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/bottomFonts"
         android:layout_width="match_parent"
@@ -68,7 +56,7 @@
     <com.example.cutter.views.VerticalSeekBar
         android:id="@+id/seekBarOutline"
         android:layout_width="wrap_content"
-        android:layout_height="300dp"
+        android:layout_height="@dimen/_200sdp"
         android:layout_centerVertical="true"
         android:progressDrawable="@drawable/track"/>
 

@@ -32,6 +32,7 @@ public class EditToolsAdapter extends RecyclerView.Adapter<EditToolsAdapter.View
         toolList.add(new ToolModel(context.getResources().getString(R.string.edit_bottom_menu_add_brightness),R.drawable.brightness,ToolType.BRIGHTNESS));
         toolList.add(new ToolModel(context.getResources().getString(R.string.edit_bottom_menu_add_contrast),R.drawable.contrast,ToolType.CONTRAST));
         toolList.add(new ToolModel(context.getResources().getString(R.string.edit_bottom_menu_add_saturation),R.drawable.saturation,ToolType.SATURATION));
+        toolList.add(new ToolModel(context.getResources().getString(R.string.edit_bottom_menu_add_vignette),R.drawable.vignette_icon,ToolType.VIGNETTE));
     }
 
     @NonNull
@@ -44,7 +45,7 @@ public class EditToolsAdapter extends RecyclerView.Adapter<EditToolsAdapter.View
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         ToolModel item = toolList.get(position);
-        holder.textView.setText(item.toolName);
+        holder.toolName.setText(item.toolName);
         holder.toolIcon.setImageResource(item.toolIcon);
     }
 
@@ -55,11 +56,11 @@ public class EditToolsAdapter extends RecyclerView.Adapter<EditToolsAdapter.View
 
     protected class ViewHolder extends RecyclerView.ViewHolder{
         protected ImageView toolIcon;
-        protected TextView textView;
+        protected TextView toolName;
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             toolIcon = itemView.findViewById(R.id.imgToolIcon);
-            textView = itemView.findViewById(R.id.txtTool);
+            toolName = itemView.findViewById(R.id.txtTool);
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

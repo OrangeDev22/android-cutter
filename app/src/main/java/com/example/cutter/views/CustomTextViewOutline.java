@@ -7,21 +7,10 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Shader;
-import android.os.Parcel;
-import android.os.Parcelable;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.util.TypedValue;
-import android.view.View.BaseSavedState;
 import android.widget.EditText;
-import android.widget.TextView;
-
-import androidx.appcompat.widget.AppCompatEditText;
-import androidx.appcompat.widget.AppCompatTextView;
-
 import com.example.cutter.R;
-
-import java.lang.reflect.Field;
 
 
 public class CustomTextViewOutline  extends EditText {
@@ -155,9 +144,7 @@ public class CustomTextViewOutline  extends EditText {
                 p.setStrokeWidth(_strokeWidth);
                 setTextColor(_strokeColor);
             }
-            Log.e("gradient_status","applying"+shader);
             //draw text stroke
-
             super.onDraw(altCanvas);
             canvas.drawBitmap(altBitmap, 0, 0, null);
             getPaint().setShader(shader);

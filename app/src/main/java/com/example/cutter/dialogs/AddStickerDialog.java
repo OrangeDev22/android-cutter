@@ -54,15 +54,10 @@ public class AddStickerDialog extends DialogFragment implements StickerAdapter.o
         LayoutInflater inflater = getActivity().getLayoutInflater();
         View view = inflater.inflate(R.layout.add_sticker_dialog,null);
         createAssetsPaths();
-        Log.e("sticker_list",stickerPaths.size()+"");
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext(),RecyclerView.HORIZONTAL,false);
         recyclerView = view.findViewById(R.id.sticker_recycler_view);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(stickerAdapter);
-        /*recyclerView.setHasFixedSize(true);
-        recyclerView.setItemViewCacheSize(20);
-        recyclerView.setDrawingCacheEnabled(true);*/
-        //recyclerView.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
         builder.setView(view)
                 .setTitle("");
         return builder.create();
@@ -74,7 +69,7 @@ public class AddStickerDialog extends DialogFragment implements StickerAdapter.o
         WindowManager.LayoutParams params = getDialog().getWindow().getAttributes();
         DisplayMetrics displayMetrics = new DisplayMetrics();
         getDialog().getWindow().getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
-        params.height = (int)(displayMetrics.heightPixels*0.20);
+        params.height = ViewGroup.LayoutParams.WRAP_CONTENT;
         params.width = ViewGroup.LayoutParams.MATCH_PARENT;
         params.dimAmount = 0;
         params.gravity = Gravity.BOTTOM | Gravity.CENTER;

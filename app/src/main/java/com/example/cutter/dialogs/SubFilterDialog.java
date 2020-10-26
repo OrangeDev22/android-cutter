@@ -31,10 +31,9 @@ public class SubFilterDialog extends DialogFragment {
     private SeekBar seekbar;;
     private onSubFilterListener listener;
     private ToolType toolType;
-    private TextView textView;
-    private String message="value";
+    private TextView textView,textViewOption;
     private Button positiveButton, negativeButton;
-    private int brightness=0;
+    private int brightness=0,vignette=0;
     private float contrast = 1.0f, saturation = 1.0f;
     private boolean apply=false;
     public SubFilterDialog(onSubFilterListener listener){
@@ -53,9 +52,10 @@ public class SubFilterDialog extends DialogFragment {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), R.style.fragmentNavBarColor);
         LayoutInflater inflater = getActivity().getLayoutInflater();
         View view = inflater.inflate(R.layout.filter_value_dialog,null);
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext(),RecyclerView.HORIZONTAL,false);
+
         seekbar = view.findViewById(R.id.seekbar_sub_filter);
         textView = view.findViewById(R.id.text_view_sub_filter_value);
+        textViewOption = view.findViewById(R.id.text_view_sub_filter_option);
         setSeekBar();
         positiveButton = view.findViewById(R.id.dialog_sub_filter_positive_button);
         negativeButton = view.findViewById(R.id.dialog_sub_filter_negative_button);
@@ -82,17 +82,23 @@ public class SubFilterDialog extends DialogFragment {
                 }else if(toolType == ToolType.CONTRAST){
                     //textView.setText(message+": "+(progress-100));
                     //progress+=100;
-                    contrast = (progress*0.001f);
+                    contrast = (progress*0.01f);
                     if(contrast >= 0.2f){
                         listener.onContrastChanged(contrast);
                     }
-                    textView.setText(((progress/10)-100)+"");
+                    //textView.setText(((progress)-10)+"");
+                    textView.setText((progress-100)+"");
 
                 }
-                else{
-                    saturation = (progress*0.001f);
+                else if(toolType == ToolType.SATURATION){
+                    saturation = (progress*0.01f);
                     listener.onSaturationChanged(saturation);
-                    textView.setText(((progress/10)-100)+"");
+                    textView.setText((progress-100)+"");
+                }
+                else{
+                    textView.setText((progress)+"");
+                    vignette = progress;
+                    listener.onVignetteChanged(vignette);
                 }
             }
 
@@ -126,35 +132,39 @@ public class SubFilterDialog extends DialogFragment {
         void onBrightnessChanged(int brightness);
         void onContrastChanged(float contrast);
         void onSaturationChanged(float saturation);
+        void onVignetteChanged(int vignette);
         void applyBrightness(int brightness,boolean apply);
         void applyContrast(float contrast, boolean apply);
         void applySaturation(float saturation,boolean apply);
+        void applyVignette(int vignette,boolean apply);
     }
     public void setToolType(ToolType toolType){
         this.toolType = toolType;
     }
 
-    @Override
-    public void onAttach(@NonNull Context context) {
-        super.onAttach(context);
-        try {
-            //listener = (onSubFilterListener) context;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(context.toString() +
-                    "must implement onSubFilterListener");
-        }
-    }
+
 
     private void setSeekBar(){
         switch (toolType){
             case BRIGHTNESS:
                 seekbar.setMax(200);
                 seekbar.setProgress(100);
+                textViewOption.setText(getResources().getString(R.string.edit_text_view_option_brightness));
+                break;
+            case VIGNETTE:
+                //set Progress 1 due to UI glitch on andorid 10
+                seekbar.setProgress(1);
+                textViewOption.setText(getResources().getString(R.string.edit_bottom_menu_add_vignette));
                 break;
             case CONTRAST:
+                seekbar.setMax(200);
+                seekbar.setProgress(100);
+                textViewOption.setText(getResources().getString(R.string.edit_text_view_option_contrast));
+                break;
             case SATURATION:
-                seekbar.setMax(2000);
-                seekbar.setProgress(1000);
+                seekbar.setMax(200);
+                seekbar.setProgress(100);
+                textViewOption.setText(getResources().getString(R.string.edit_text_view_option_saturation));
                 break;
         }
     }
@@ -171,7 +181,10 @@ public class SubFilterDialog extends DialogFragment {
             case SATURATION:
                 listener.applySaturation(saturation,apply);
                 break;
+            case VIGNETTE:
+                listener.applyVignette(vignette,apply);
         }
         super.onDestroy();
     }
+
 }

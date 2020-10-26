@@ -24,7 +24,6 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.example.cutter.adapters.CropToolsAdapter;
-import com.example.cutter.adapters.EditToolsAdapter;
 import com.example.cutter.constants.Constants;
 import com.example.cutter.tools.ToolType;
 import com.example.cutter.utils.ImageUtilities;

@@ -1,12 +1,7 @@
 package com.example.cutter.adapters;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.media.TimedText;
-import android.net.Uri;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,8 +11,6 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.cutter.R;
-import com.example.cutter.utils.BitmapUtils;
-
 import java.io.IOException;
 import java.util.List;
 
@@ -43,14 +36,12 @@ public class StickerAdapter extends RecyclerView.Adapter<StickerAdapter.ViewHold
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Drawable drawable = null;
-        Bitmap temp = null;
         try {
             drawable = Drawable.createFromStream(context.getAssets().open(list.get(position)), null);
-            
         } catch (IOException e) {
             e.printStackTrace();
         }
-        holder.imageView.setBackground(drawable);
+        holder.imageViewStickerIcon.setBackground(drawable);
     }
 
     @Override
@@ -61,10 +52,10 @@ public class StickerAdapter extends RecyclerView.Adapter<StickerAdapter.ViewHold
         void onStickerSelected(int position);
     }
     public class ViewHolder extends RecyclerView.ViewHolder{
-        ImageView imageView;
+        ImageView imageViewStickerIcon;
         ViewHolder(View itemView){
             super(itemView);
-            imageView = itemView.findViewById(R.id.imgStickerIcon);
+            imageViewStickerIcon = itemView.findViewById(R.id.imgStickerIcon);
             itemView.setOnClickListener(new View.OnClickListener(){
                 @Override
                 public void onClick(View v) {

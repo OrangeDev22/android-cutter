@@ -8,9 +8,19 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="@color/white"
+        android:layout_centerHorizontal="true"
         android:padding="10dp"
         android:textSize="20sp"
-        android:text="0" />
+        android:text="0"/>
+    <TextView
+        android:id="@+id/text_view_sub_filter_option"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:text="Sub Filter"
+        android:textColor="@color/white"
+        android:textSize="20sp"
+        />
     <SeekBar
         android:id="@+id/seekbar_sub_filter"
         android:layout_width="match_parent"

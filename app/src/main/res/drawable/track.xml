@@ -1,24 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:gravity="center_vertical">
-        <shape android:shape="rectangle">
-            <solid android:color="@android:color/darker_gray"/>
-            <size android:height="@dimen/_5sdp"/>
-            <corners android:radius="@dimen/_2sdp"/>
-        </shape>
-    </item>
-    <item android:gravity="center_vertical">
-       <scale android:scaleWidth="100%">
-           <selector>
-               <item android:state_enabled="false" android:drawable="@android:color/transparent"/>
-               <item>
-                   <shape android:shape="rectangle">
-                       <solid android:color="@color/colorAccent"/>
-                       <size android:height="@dimen/_5sdp"/>
-                       <corners android:radius="@dimen/_2sdp"/>
-                   </shape>
-               </item>
-           </selector>
-       </scale>
-    </item>
+<item android:gravity="center_vertical">
+    <shape android:shape="rectangle">
+        <solid android:color="@android:color/darker_gray"/>
+        <size android:height="@dimen/_5sdp"/>
+        <corners android:radius="@dimen/_2sdp"/>
+    </shape>
+</item>
+<item android:gravity="center_vertical">
+    <scale android:scaleWidth="100%">
+        <selector>
+            <item android:state_enabled="false" android:drawable="@android:color/transparent"/>
+            <item>
+                <shape android:shape="rectangle">
+                    <solid android:color="@color/colorAccent"/>
+                    <size android:height="@dimen/_5sdp"/>
+                    <corners android:radius="@dimen/_2sdp"/>
+                </shape>
+            </item>
+        </selector>
+    </scale>
+</item>
 </layer-list>
+<!--<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+<item android:id="@android:id/background"> <!-background of seekbar-->
+   <!-- <shape>
+        <corners android:radius="5dip" />
+        <size android:height="@dimen/_5sdp"/>
+        <solid android:color="#F7CCBD" />
+    </shape>
+</item>
+<item android:id="@android:id/progress"> <!-progress color-->
+    <!--<clip>
+        <shape>
+            <corners android:radius="5dip" />
+            <size android:height="@dimen/_5sdp"/>
+            <solid android:color="#87DED5" />
+        </shape>
+    </clip>
+</item>
+<item android:id="@android:id/secondaryProgress"> <!-secondaryProgress color-->
+   <!-- <clip>
+        <shape>
+            <corners android:radius="5dip" />
+            <size android:height="@dimen/_5sdp"/>
+            <solid android:color="#F7CCBD" />
+        </shape>
+    </clip>
+</item>
+</layer-list>-->

@@ -11,6 +11,7 @@ public enum ToolType {
     FILTER,
     RECTANGLE,
     OVAL,
+    VIGNETTE,
     ASPECTRATIO,
     SELECTALL,
     ONEBYONE,

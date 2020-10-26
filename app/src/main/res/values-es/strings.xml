@@ -29,4 +29,14 @@
     <string name="bottom_crop_aspect_ratio_all">Todo</string>
     <string name="null_image_message">Archivo invalido. Por favor seleccione una imagen valida</string>
     <string name="edit_text_hint">Ejemplo</string>
+    <string name="edit_text_view_option_contrast">Contraste</string>
+    <string name="edit_text_view_option_saturation">Saturaciom</string>
+    <string name="edit_text_view_option_brightness">Brillo</string>
+    <string name="edit_bottom_menu_add_vignette">Viñetado</string>
+    <string name="main_message">Hola! somos un grupo peño de desarrolladores. Prometemos actualizar esta app en el futuro y agregar nuevas funciones. Si tienes algun problema escribenos a: OrangeDev8@gmail.com</string>
+    <string name="acra_notification_tittle">La aplicación se detuvo por favor enviar un reporte</string>
+    <string name="acra_notification_text">Algo fallo. Por favor toque el boten de aceptar y envie el reporte a los desarrolladores</string>
+    <string name="acra_send_button_text">Enviar Reporte</string>
+    <string name="acra_discard_button_text">No enviar Reporte</string>
+    <string name="acra_chanel_name">Notification</string>
 </resources>

@@ -58,12 +58,9 @@ public class TextToolsAdapter extends RecyclerView.Adapter<TextToolsAdapter.View
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        //holder.selector.setVisibility(View.GONE);
         ToolModel item = mToolList.get(position);
         holder.txtTool.setText(item.mToolName);
         holder.imgToolIcon.setImageResource(item.mToolIcon);
-        //if text tool is selected set triangle visible
-        //if (index == position)holder.selector.setVisibility(View.VISIBLE);
     }
 
     @Override
@@ -85,11 +82,6 @@ public class TextToolsAdapter extends RecyclerView.Adapter<TextToolsAdapter.View
                 }
             });
         }
-    }
-    //Method to set the selected tool
-    public void setSelectedTool (int position){
-        index = position;
-        notifyDataSetChanged();
     }
 }
 
